@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-print('carlinhos e jurandir')
-=======
-print('carlinhos e jurandir')
-print('brigaram por conta de falta de queijo')
->>>>>>> main
+from global_configs import PLAYER_FILE_PATH
+
+print(f"PLAYER_FILE_PATH: {PLAYER_FILE_PATH}")
