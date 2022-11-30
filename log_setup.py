@@ -1,5 +1,5 @@
 import logging
-
+from global_configs import VERBOSE
 
 class ColourFormatter(logging.Formatter):
 
@@ -13,7 +13,7 @@ class ColourFormatter(logging.Formatter):
 
     FORMATS = {
         level: logging.Formatter(
-            f"\x1b[30;1m%(asctime)s\x1b[0m {colour}%(levelname)-8s\x1b[0m \x1b[35m%(name)s\x1b[0m %(message)s",
+            f"\x1b[30;1m%(asctime)s\x1b[0m {colour}%(levelname)-8s\x1b[0m \x1b[0m %(message)s",
             "%Y-%m-%d %H:%M:%S",
         )
         for level, colour in LEVEL_COLOURS
@@ -47,17 +47,16 @@ def setup_logger():
     return logger
 
 
-def get_main_logger():
-    return logging.getLogger("global")
-
-
 def change_log_level(logger, level):
     logger.setLevel(level)
 
+logger = setup_logger()
 
-def make_main_logger_verbose(enable=False):
-    logger = get_main_logger()
+def make_logger_verbose(logger, enable=True):
     if enable:
         change_log_level(logger, "DEBUG")
     else:
         change_log_level(logger, "INFO")
+
+if VERBOSE:
+    make_logger_verbose(logger)
