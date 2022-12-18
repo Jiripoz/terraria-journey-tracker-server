@@ -2,6 +2,7 @@ from global_configs import PLAYER_FILE_PATH, VERBOSE
 from log_setup import logger
 from decrypt import decrypt, int8, uint8, int32, uint32, boolean, btes, string, struct
 from dataclasses import dataclass
+from src.item_db import item_db
 
 logger.info("starting script")
 logger.debug(f"PLAYER_FILE_PATH: {PLAYER_FILE_PATH}")
@@ -94,3 +95,6 @@ class Char:
 
 player = Char(raw)
 print(player.version)
+# Example usage:
+item_1 = item_db.get_item(1)
+logger.info(item_1)
