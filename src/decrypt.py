@@ -5,7 +5,7 @@ import struct
 key = "6800330079005F006700550079005A00"
 
 
-def decrypt(raw: bytes) -> bytes:
+def decrypt_player_file(raw: bytes) -> bytes:
 
     with open("tmp", "wb") as f:
         f.write(raw)
