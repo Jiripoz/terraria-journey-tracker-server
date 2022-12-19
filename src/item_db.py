@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 import json
+import os
+from os import path
 
 IMAGE_ROOT_URL = "https://static.wikia.nocookie.net/terraria_gamepedia/images/"
 WIKI_ROOT_URL = "https://terraria.fandom.com/wiki/"
-ITEMS_JSON_PATH = r"E:\python\terraria\terraria-journey-tracker-server\data\items.json"
+ITEMS_JSON_PATH = str(path.join(path.abspath(os.getcwd()), "data", "items.json"))
 
 
 @dataclass
