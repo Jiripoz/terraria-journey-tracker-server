@@ -3,7 +3,7 @@ import json
 
 IMAGE_ROOT_URL = "https://static.wikia.nocookie.net/terraria_gamepedia/images/"
 WIKI_ROOT_URL = "https://terraria.fandom.com/wiki/"
-ITEMS_JSON_PATH = "data/items.json"
+ITEMS_JSON_PATH = r"E:\python\terraria\terraria-journey-tracker-server\data\items.json"
 
 
 @dataclass
@@ -22,17 +22,6 @@ class Item:
 
 class ItemDB:
     def __init__(self, items: list):
-        # Each item has a JSON body similar to this:
-        # {
-        #     "id": 1,
-        #     "name": "Iron Pickaxe",
-        #     "internalName": "IronPickaxe",
-        #     "itemUrl": "Iron_Pickaxe",
-        #     "imageUrl": "a/a2/Iron_Pickaxe.png",
-        #     "category": "weapons",
-        #     "research": 1
-        # }
-
         self.items_dict = {}
 
         for item in items:
@@ -47,7 +36,9 @@ class ItemDB:
             )
 
     def get_item(self, item_id: int) -> Item:
-        return self.items_dict[item_id]
+        if item_id in self.items_dict:
+            return self.items_dict[item_id]
+        return None
 
     def get_all_items(self) -> list:
         return list(self.items_dict.values())
@@ -57,7 +48,11 @@ class ItemDB:
 
     # Kinda slow
     def get_item_by_internal_name(self, internal_name: str) -> Item:
-        return [item for item in self.items_dict.values() if item.internal_name == internal_name][0]
+        return [
+            item
+            for item in self.items_dict.values()
+            if item.internal_name == internal_name
+        ][0]
 
 
 with open(ITEMS_JSON_PATH) as f:
