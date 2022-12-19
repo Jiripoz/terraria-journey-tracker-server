@@ -1,6 +1,18 @@
 from global_configs import PLAYER_FILE_PATH, VERBOSE
 from log_setup import logger
-from decrypt import decrypt, int8, uint8, int32, uint32, boolean, btes, string, struct
+from decrypt import (
+    decrypt,
+    int8,
+    uint8,
+    int32,
+    uint32,
+    boolean,
+    btes,
+    string,
+    struct,
+    longjohnson,
+    shortjohnson,
+)
 from dataclasses import dataclass
 from src.item_db import item_db
 
@@ -16,85 +28,120 @@ class Char:
     def __init__(self, bytes) -> None:
         self.bytes = bytes
         self.offset: int = 0
-        self.version: int = uint32(self.rbytes(4)[1])
-        self.company: str = string(self.rbytes(7)[1], 7)
-        self.fileType: int = uint8(self.rbytes(1)[1])
-        print(
-            "version: %s, company: %s, fileType: %s"
-            % (self.version, self.company, self.fileType)
-        )
-        self.offset += 12
 
-        self.name_lenght: int = uint8(self.rbytes(1)[1])
-        self.name: str = string(self.rbytes(self.name_lenght)[1], self.name_lenght)
-        self.difficulty: int = int8(self.rbytes(1)[1])
-        self.playTime: int = int(struct.unpack("<Q", self.rbytes(8)[1])[0]) / 10000000
-        print(
-            "name lenght: %s, name: %s, difficulty: %s, play time: %s"
-            % (self.name_lenght, self.name, self.difficulty, self.playTime)
-        )
-        self.offset += 9
+        # const version = data.readInt16LE();
+        # if(!SUPPORTED_VERSIONS.includes(version)) {
+        #     throw new Error(`This library only supports 4.1.2 (and others with the same format) (version id = ${ version })`);
+        # }
 
-        self.HP: int = int32(self.rbytes(4)[1])
-        self.HPMax: int = int32(self.rbytes(4)[1])
-        self.Mana: int = int32(self.rbytes(4)[1])
-        self.ManaMAx: int = int32(self.rbytes(4)[1])
-        self.extraAccessory: int = boolean(self.rbytes(1)[1])
-        print(
-            "current hp: %s, max hp: %s, current mana: %s, max mana: %s, consumed demon heart: %s"
-            % (self.HP, self.HPMax, self.Mana, self.ManaMAx, self.extraAccessory)
-        )
+        logger.debug("Starting parse...")
+
+        self.version = uint32(self.rbytes(4))
+        logger.debug(f"version: {self.version}")
+
+        # Skip Relogic bullshit name etc
+        self.offset += 24
+
+        # let pos = NAME_OFFSET;
+        # [, pos] = read_lpstring(data, pos);
+        self.name = self.read_string()
+        logger.debug(f"name: {self.name}")
+
+        # // Skip over everything up to the spawn points, all of which is
+        # // thankfully static
+        self.offset += 2460 + 231  # SPAWN_POINT_OFFSET
+
+        # // Read spawnpoint data until we get to -1, which is the terminator
+        # while(data.readInt32LE(pos) !== -1) {
+        #     // Skip X + Y + Seed (each are 32 bits)
+        #     pos += 12;
+
+        #     // Read the world name
+        #     [, pos] = read_lpstring(data, pos);
+        # }
+
+        # Read the first spawn point2460
+        last_spawn_point = int32(self.rbytes(4))
+
+        while last_spawn_point != -1:
+            self.offset += 12
+
+            # Read the world name
+            world_name = self.read_string()
+            logger.debug(f"World name: {world_name}")
+
+            last_spawn_point = int32(self.rbytes(4))
+
+        # // Skip over the next part - not sure what this data is
+        # pos += JOURNEY_OFFSET;
+
+        self.offset += 107
+
+        while True:
+            item_internal_name = self.read_string()
+
+            if item_internal_name == "":
+                logger.debug("Stopped reading Journey")
+                break
+
+            research_progress = int32(self.rbytes(4))
+            self.offset += 4
+
+            item = item_db.get_item_by_internal_name(item_internal_name)
+
+            if not item:
+                logger.error(f"Oooops! We are missing item {item_internal_name}")
+
+            logger.debug(
+                f"Researched {research_progress}/{item.research_needed} of {item.name}"
+            )
+
+        # for(;;) {
+        #     let item;
+        #     [item, pos] = read_lpstring(data, pos);
+        #     if(item.length === 0) {
+        #     break;
+        #     }
+
+        #     const quantity = data.readInt32LE(pos);
+        #     pos += 4;
+
+        #     if(!results[item]) {
+        #     console.warn(`Uh oh! Missing item: ${ item }`);
+        #     continue;
+        #     }
+
+        #     results[item].has = quantity;
+        #     results[item].researched = items[item].needed <= quantity;
+        # }
+
+        # return results;
+
+    def rbytes(self, n):
+        return self.bytes[self.offset : self.offset + n]
+
+    # Reads the next byte. It contains how many bytes we should read.
+    def read_string(self):
+        size_bytes = self.rbytes(1)
+        size = uint8(size_bytes)
+
         self.offset += 1
 
-        self.taxMoney: int = int32(self.rbytes(4)[1])
+        # logger.debug(f"[read_string] Got size {size}")
 
-        self.offset += 23
+        str_bytes = self.rbytes(size)
+        string_return = string(str_bytes, size)
+        logger.debug(f"[read_string] Got string {string_return}")
 
-        self.armor: dict = [
-            {"id": int32(self.rbytes(4)[1]), "prefix": uint8(self.rbytes(1)[1])}
-            for i in range(3)
-        ]
-        self.acessories: dict = [
-            {"id": int32(self.rbytes(4)[1]), "prefix": uint8(self.rbytes(1)[1])}
-            for i in range(6)
-        ]
-        print("armor: %s\nacessories: %s" % (self.armor, self.acessories))
-        self.offset += 10
+        self.offset += size
 
-        self.dye: dict = [
-            {"id": int32(self.rbytes(4)[1]), "prefix": uint8(self.rbytes(1)[1])}
-            for i in range(12)
-        ]
-        print("dyes: %s" % self.dye)
-        self.offset += 35
-
-        self.inventory = []
-        for i in range(58):
-            id: int = int32(self.rbytes(4)[1])
-            if id >= 5600 or id == 0:
-                self.inventory.append({"id": 0})
-                self.offset += 6
-            else:
-                self.inventory.append(
-                    {
-                        "id": id,
-                        "stack": int32(self.rbytes(4)[1]),
-                        "prefix": uint8(self.rbytes(1)[1]),
-                        "favorites": boolean(self.rbytes(1)[1]),
-                    }
-                )
-        print(self.inventory)
-
-    def rbytes(self, n, get: bool = True):
-        if get:
-            self.offset += n
-            return self.offset - n, self.bytes[self.offset - n : self.offset]
-        else:
-            return self.bytes[self.offset : self.offset + n]
+        return string_return
 
 
-player = Char(raw)
-print(player.version)
+print("Parsing char!")
+c = Char(raw)
+
+
 # Example usage:
-item_1 = item_db.get_item(1)
-logger.info(item_1)
+# item_1 = item_db.get_item(1)
+# logger.info(item_1)

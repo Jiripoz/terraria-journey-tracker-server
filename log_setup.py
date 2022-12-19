@@ -1,6 +1,7 @@
 import logging
 from global_configs import VERBOSE
 
+
 class ColourFormatter(logging.Formatter):
 
     LEVEL_COLOURS = [
@@ -50,13 +51,16 @@ def setup_logger():
 def change_log_level(logger, level):
     logger.setLevel(level)
 
+
 logger = setup_logger()
+
 
 def make_logger_verbose(logger, enable=True):
     if enable:
         change_log_level(logger, "DEBUG")
     else:
         change_log_level(logger, "INFO")
+
 
 if VERBOSE:
     make_logger_verbose(logger)
