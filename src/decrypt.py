@@ -5,7 +5,7 @@ import struct
 key = "6800330079005F006700550079005A00"
 
 
-def decrypt(raw: bytes) -> bytes:
+def decrypt_player_file(raw: bytes) -> bytes:
 
     with open("tmp", "wb") as f:
         f.write(raw)
@@ -27,10 +27,6 @@ def decrypt(raw: bytes) -> bytes:
     return data
 
 
-def int8(byte: bytes) -> int:
-    return struct.unpack("<b", byte)[0]
-
-
 def uint8(byte: bytes) -> int:
     try:
         return struct.unpack("B", byte)[0]
@@ -44,10 +40,6 @@ def int32(byte: bytes) -> int:
 
 def uint32(byte: bytes) -> int:
     return struct.unpack("<I", byte)[0]
-
-
-def boolean(byte: bytes) -> bool:
-    return bool(uint8(byte))
 
 
 def btes(byte: bytes, count: int = 0) -> dict:
