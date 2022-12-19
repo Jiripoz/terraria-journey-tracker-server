@@ -22,17 +22,6 @@ class Item:
 
 class ItemDB:
     def __init__(self, items: list):
-        # Each item has a JSON body similar to this:
-        # {
-        #     "id": 1,
-        #     "name": "Iron Pickaxe",
-        #     "internalName": "IronPickaxe",
-        #     "itemUrl": "Iron_Pickaxe",
-        #     "imageUrl": "a/a2/Iron_Pickaxe.png",
-        #     "category": "weapons",
-        #     "research": 1
-        # }
-
         self.items_dict = {}
 
         for item in items:

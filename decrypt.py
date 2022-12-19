@@ -50,14 +50,6 @@ def boolean(byte: bytes) -> bool:
     return bool(uint8(byte))
 
 
-def longjohnson(byte: bytes) -> int:
-    return struct.unpack("q", byte)[0]
-
-
-def shortjohnson(byte: bytes) -> int:
-    return struct.unpack("h", byte)[0]
-
-
 def btes(byte: bytes, count: int = 0) -> dict:
     return [byte[i] for i in range(count)]
 
