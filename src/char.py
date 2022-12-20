@@ -10,9 +10,6 @@ from global_configs import PLAYER_FILE_PATH
 from log_setup import logger
 
 
-# decrypt file and get raw bytes
-
-
 class Char:
     def __init__(self, path) -> None:
         eraw: bytes = open(path, "rb").read()
