@@ -9,11 +9,11 @@ logger.debug(f"VERBOSE: {VERBOSE}")
 
 
 def main_loop():
-    get_char(PLAYER_FILE_PATH)
+    player = get_char(PLAYER_FILE_PATH)
+    player.print_progress_overview()
+    player.print_partially_researched()
 
-    # TODO: Juntar player com infos de items
-    # TODO: Apresentar
-    # - Apresentar pode ser escrever na tela, mandar pro websocket, qualquer coisa
 
+main_loop()
 
 setup_watchdog(PLAYER_FILE_PATH, main_loop)
