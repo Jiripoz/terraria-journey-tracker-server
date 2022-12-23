@@ -1,6 +1,5 @@
 import requests
 import json
-from collections import ChainMap
 
 API = "https://terraria.wiki.gg//api.php"
 PARAMS = {
@@ -12,25 +11,18 @@ PARAMS = {
 }
 
 S = requests.Session()
-
-
 R = S.get(url=API, params=PARAMS)
-
 DATA = R.json()
-
 final = []
 
-while PARAMS["offset"] < 10000:
+while DATA["cargoquery"] != []:
     try:
-        R = S.get(url=API, params=PARAMS)
-        DATA = R.json()
-        if DATA["cargoquery"] == []:
-            print(DATA["cargoquery"])
-            break
         for item in DATA["cargoquery"]:
             final.append(item["title"])
 
         PARAMS["offset"] += 50
+        R = S.get(url=API, params=PARAMS)
+        DATA = R.json()
 
     except:
         break
