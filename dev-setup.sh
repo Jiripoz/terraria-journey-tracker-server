@@ -1,10 +1,6 @@
 #!/bin/bash
+
+
 python -m venv venv
-
-if [ "$OSTYPE" == "msys" ]; then
-    source venv/Scripts/activate
-else
-    source venv/bin/activate
-fi
-
+source venv/Scripts/activate
 pip install -r requirements.txt
