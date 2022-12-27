@@ -56,6 +56,9 @@ class ItemDB:
             if item.internal_name == internal_name
         ][0]
 
+    def get_item_by_name(self, name: str) -> Item:
+        return [item for item in self.items_dict.values() if item.name == name][0]
+
 
 with open(ITEMS_JSON_PATH) as f:
     items = json.load(f)
