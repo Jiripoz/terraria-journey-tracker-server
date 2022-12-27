@@ -27,10 +27,10 @@ def get_ingredients(r):
 
 class RecipeDB:
     def __init__(self, recipes: list):
-        self.recipes_dict = {}
+        self.recipes_list = []
 
         for recipe in recipes:
-            self.recipes_dict[recipe["resultid"]] = Recipe(
+            self.recipes_list[recipe["result"]] = Recipe(
                 result=recipe["result"],
                 resultid=recipe["resultid"],
                 station=recipe["station"],
@@ -38,8 +38,7 @@ class RecipeDB:
             )
 
     def get_recipe(self, item_id: int):
-        if item_id in self.recipes_dict:
-            return self.recipes_dict[item_id]
+        return [x for x in self.recipes_dict.result]
 
 
 with open(RECIPE_JSON_PATH) as f:

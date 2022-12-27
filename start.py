@@ -2,21 +2,24 @@ from global_configs import PLAYER_FILE_PATH, VERBOSE
 from src.log_setup import logger
 from src.char import get_char
 from src.cachorro import setup_watchdog
+import data.fetch_recipe
 
-logger.info("starting script")
-logger.debug(f"PLAYER_FILE_PATH: {PLAYER_FILE_PATH}")
-logger.debug(f"VERBOSE: {VERBOSE}")
+# from src.recipe_db import recipe_db
 
-
-def main_loop():
-    player = get_char(PLAYER_FILE_PATH)
-    player.print_progress_overview()
-    player.print_partially_researched()
+# logger.info("starting script")
+# logger.debug(f"PLAYER_FILE_PATH: {PLAYER_FILE_PATH}")
+# logger.debug(f"VERBOSE: {VERBOSE}")
 
 
-main_loop()
+# def main_loop():
+#     player = get_char(PLAYER_FILE_PATH)
+#     player.print_progress_overview()
+#     player.print_partially_researched()
 
-setup_watchdog(PLAYER_FILE_PATH, main_loop)
+
+# main_loop()
+
+# setup_watchdog(PLAYER_FILE_PATH, main_loop)
 
 
 # from flask import Flask, render_template

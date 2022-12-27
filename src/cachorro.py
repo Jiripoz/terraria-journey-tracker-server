@@ -3,7 +3,7 @@ import watchdog.observers
 import time
 from os import path
 from datetime import datetime
-from log_setup import logger
+from src.log_setup import logger
 
 
 class Handler(watchdog.events.PatternMatchingEventHandler):
