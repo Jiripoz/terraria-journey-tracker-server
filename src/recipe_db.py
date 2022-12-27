@@ -10,13 +10,13 @@ RECIPE_JSON_PATH = str(path.join(path.abspath(os.getcwd()), "data", "recipe.json
 
 @dataclass
 class Recipe:
-    result: str
-    resultid: int
+    id: int
+    name: str
     station: str
     ingredients: dict
 
     def __str__(self):
-        return f"item name: {self.result}, id: {self.resultid}, station: {self.station}"
+        return f"item name: {self.name}, id: {self.id}, station: {self.station}"
 
 
 def get_ingredients(r):
@@ -27,22 +27,23 @@ def get_ingredients(r):
 
 class RecipeDB:
     def __init__(self, recipes: list):
-        self.recipes_list = []
+        self.recipes_list = {}
 
         for recipe in recipes:
-            self.recipes_list[recipe["result"]] = Recipe(
-                result=recipe["result"],
-                resultid=recipe["resultid"],
+            self.recipes_list[recipe["id"]] = Recipe(
+                id=recipe["id"],
+                name=recipe["name"],
                 station=recipe["station"],
-                ingredients=get_ingredients(recipe),
+                ingredients=recipe["ingredients"],
             )
 
     def get_recipe(self, item_id: int):
-        return [x for x in self.recipes_dict.result]
+        if item_id in self.recipes_list:
+            return self.recipes_list[item_id]
 
 
 with open(RECIPE_JSON_PATH) as f:
     recipes = json.load(f)
     recipe_db = RecipeDB(recipes=recipes)
 
-# print(recipe_db.get_recipe("100"))
+print(recipe_db.get_recipe(10))

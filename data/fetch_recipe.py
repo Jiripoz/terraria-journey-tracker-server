@@ -3,6 +3,9 @@ import json
 import re
 import sys
 from src.item_db import item_db
+from src.log_setup import logger
+
+logger.debug("Running fetch_recipe.py...")
 
 API = "https://terraria.wiki.gg//api.php"
 PARAMS = {
@@ -41,9 +44,12 @@ with open("alternative_db.json", "r") as g:
 def get_ids(lst):
     for j in alternative_db:
         if lst == j:
-            return alternative_db[j]
+            ids = []
+            for item in alternative_db[j]:
+                ids.append(int(item))
+            return ids
     try:
-        return item_db.get_item_by_name(str(lst)).id
+        return int(item_db.get_item_by_name(str(lst)).id)
     except:
         return lst
 
@@ -61,15 +67,25 @@ def prepare(r):
 
 ff = []
 for item in final:
-    entry = {
-        "id": item["resultid"],
-        "name": item["result"],
-        "station": item["station"],
-        "ingredients": prepare(item["args"]),
-    }
-    ff.append(entry)
+    try:
+        entry = {
+            "id": int(item["resultid"]),
+            "name": item["result"],
+            "station": item["station"],
+            "ingredients": prepare(item["args"]),
+        }
+        ff.append(entry)
+    except:
+        entry = {
+            "id": item["resultid"],
+            "name": item["result"],
+            "station": item["station"],
+            "ingredients": prepare(item["args"]),
+        }
+        ff.append(entry)
 
 
-print(ff)
 with open("data/recipe.json", "w") as f:
     json.dump(ff, f, indent=4)
+
+logger.debug("Done! Recipes saved in data folder as recipe.json and raw_recipe.json")
