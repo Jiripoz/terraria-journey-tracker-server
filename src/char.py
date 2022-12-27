@@ -149,3 +149,13 @@ def get_char(path=None):
     if path == None:
         path = PLAYER_FILE_PATH
     return Char(path)
+
+
+# -> print_progress_overview()
+# -> print_almost_researched_items()
+# print_progress_overview
+# - printa quanta coisa foi pesquisada
+# - printa quantos % foi pesquisado
+# - printa a soma de research needed pra cada item não pesquisado (ou seja, quanto falta pra pesquisar todos do jogo)
+# print_almost_researched_items
+# - printa uma lista de [ID] Nome do Item: x/y
