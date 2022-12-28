@@ -8,6 +8,7 @@ from src.decrypt import (
 from src.item_db import item_db
 from global_configs import PLAYER_FILE_PATH
 from src.log_setup import logger
+from src.recipe_db import recipe_db
 
 
 class Char:
@@ -15,9 +16,11 @@ class Char:
         eraw: bytes = open(path, "rb").read()
         self.bytes: bytes = decrypt_player_file(eraw)
         self.offset: int = 0
+        self.all_items = item_db.get_all_items()
         self.items_progress: dict = {}
         self.researched = []
         self.partially_researched = []
+        self.not_researched = []
 
         logger.debug("Starting parse...")
 
@@ -92,12 +95,10 @@ class Char:
 
     def print_progress_overview(self):
         logger.info("==============================")
-        progress = round(
-            float(100 * len(self.researched) / len(item_db.get_all_items())), 2
-        )
+        progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
         logger.info(f"Journey mode progress: {progress}%")
         logger.info(
-            f"Researched {len(self.researched)} from {len(item_db.get_all_items())} total items"
+            f"Researched {len(self.researched)} from {len(self.all_items)} total items"
         )
 
         return
@@ -127,8 +128,7 @@ class Char:
 
         absolute_sum += research_sum
 
-        all_items = item_db.get_all_items()
-        for id in all_items:
+        for id in self.all_items:
             total_sum += id.research_needed
 
         total = round(float(100 * absolute_sum / total_sum), 2)
@@ -144,18 +144,31 @@ class Char:
 
         return
 
+    def get_easy_researchs(self):
+        easy_research = []
+        all_ids = [x.id for x in self.all_items]
+        remaining = [y for y in all_ids if y not in self.researched]
+        for id in remaining:
+            try:
+                if check_easy(id, self.researched):
+                    easy_research.append(id)
+                continue
+            except:
+                continue
+        logger.info(f"Items that can be easily researched are: \n {easy_research}")
+        return easy_research
+
+
+def check_easy(item_id, researched):
+    # logger.info()
+    item_recipe = recipe_db.recipes_list[item_id]
+    ingredients = [x["id"] for x in item_recipe.ingredients]
+    if all(y in researched for y in ingredients):
+        return True
+    return False
+
 
 def get_char(path=None):
     if path == None:
         path = PLAYER_FILE_PATH
     return Char(path)
-
-
-# -> print_progress_overview()
-# -> print_almost_researched_items()
-# print_progress_overview
-# - printa quanta coisa foi pesquisada
-# - printa quantos % foi pesquisado
-# - printa a soma de research needed pra cada item não pesquisado (ou seja, quanto falta pra pesquisar todos do jogo)
-# print_almost_researched_items
-# - printa uma lista de [ID] Nome do Item: x/y
