@@ -14,6 +14,7 @@ class Recipe:
     name: str
     station: str
     ingredients: dict
+    id_list: list
 
     def __str__(self):
         return f"item name: {self.name}, id: {self.id}, station: {self.station}"
@@ -35,6 +36,7 @@ class RecipeDB:
                 name=recipe["name"],
                 station=recipe["station"],
                 ingredients=recipe["ingredients"],
+                id_list=recipe["id_list"],
             )
 
     def get_recipe(self, item_id: int):
@@ -45,5 +47,3 @@ class RecipeDB:
 with open(RECIPE_JSON_PATH) as f:
     recipes = json.load(f)
     recipe_db = RecipeDB(recipes=recipes)
-
-print(recipe_db.get_recipe(10))
