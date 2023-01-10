@@ -15,30 +15,10 @@ def main_loop():
     player.print_progress_overview()
     player.print_partially_researched()
 
+    player.get_easy_researchs()
 
-#    player.get_easy_researchs()
 
-
-t1 = threading.Thread(target=main_loop())
-t2 = threading.Thread(target=setup_watchdog(PLAYER_FILE_PATH, main_loop))
+t1 = threading.Thread(target=setup_watchdog(PLAYER_FILE_PATH, main_loop))
 t1.start()
-t2.start()
 
-# from flask import Flask, render_template
-# from flask_socketio import SocketIO
-# from flask_cors import CORS
-
-# app = Flask(__name__, instance_relative_config=True)
-# app.config.update(SECRET_KEY="a")
-
-# print("Starting with config:")
-# print(app.config)
-
-# CORS(app)
-# app.config["CORS_HEADER"] = "Content-Type"
-
-# socketio = SocketIO(app, cors_allowed_origins="*", logger=True)
-
-
-# if __name__ == "__main__":
-#     socketio.run(app)
+t1.join()

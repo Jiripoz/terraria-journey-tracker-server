@@ -61,14 +61,12 @@ def get_ids(lst):
 def prepare(r):
     lst = [x for x in re.split("[Â|^|¦]", r["args"]) if x != ""]
     ingredients = []
-    id_list = []
     for i in range(0, len(lst), 2):
         name = lst[i]
         id = get_ids(lst[i])
         amount = lst[i + 1]
         ingredients.append({"name": name, "id": id, "amount": amount})
-        id_list.append(id)
-    return id_list, ingredients
+    return ingredients
 
 
 def get_station(r):
@@ -85,12 +83,9 @@ def get_station(r):
 
 ff = []
 for item in final:
-    id_list, ingredients = prepare(item)
+    ingredients = prepare(item)
     try:
         station = get_station(item["station"])
-        print(f"id list before: {id_list}, station: {station} {type(station)}")
-        id_list.extend(station)
-        print(f"apendei uma station de valor: {station}, {id_list}")
     except:
         station = item["station"]
 
@@ -104,7 +99,6 @@ for item in final:
         "name": item["result"],
         "station": station,
         "ingredients": ingredients,
-        "id_list": id_list,
     }
     ff.append(entry)
 
