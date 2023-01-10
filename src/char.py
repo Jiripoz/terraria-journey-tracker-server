@@ -158,6 +158,9 @@ class Char:
         logger.info(f"Items that can be easily researched are: \n {easy_research}")
         return easy_research
 
+    def get_progress_json(self):
+        return {}
+
 
 def check_easy(item_id, researched):
     # logger.info()
