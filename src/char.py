@@ -9,6 +9,7 @@ from src.item_db import item_db
 from global_configs import PLAYER_FILE_PATH
 from src.log_setup import logger
 from src.recipe_db import recipe_db
+import json
 
 
 class Char:
@@ -21,6 +22,7 @@ class Char:
         self.researched = []
         self.partially_researched = []
         self.not_researched = []
+        self.info: dict = {}
 
         logger.debug("Starting parse...")
 
@@ -96,6 +98,10 @@ class Char:
     def print_progress_overview(self):
         logger.info("==============================")
         progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
+        self.info["progress"] = f"Journey mode progress: {progress}%"
+        self.info[
+            "research"
+        ] = f"Researched {len(self.researched)} from {len(self.all_items)} total items"
         logger.info(f"Journey mode progress: {progress}%")
         logger.info(
             f"Researched {len(self.researched)} from {len(self.all_items)} total items"
@@ -103,10 +109,11 @@ class Char:
 
         return
 
-    def print_partially_researched(self):
+    def get_partially_researched(self):
         research_sum: int = 0
         absolute_sum: int = 0
         total_sum: int = 0
+        self.info["partial"] = f"Items partially researched: "
         logger.info(f"Items partially researched: ")
         lista_tuplas = []
         for id in self.partially_researched:
@@ -136,7 +143,12 @@ class Char:
         lista_tuplas.sort(key=lambda a: a[0], reverse=True)
         for progress, name, research_needed, item_progress in lista_tuplas:
             logger.info(f"{name}: {item_progress}/{research_needed} ({progress}%) ")
+            self.info[f"{name}"] = f": {item_progress}/{research_needed} ({progress}%) "
 
+        self.info["sum"] = f"The sum of items needed to research is {research_sum}"
+        self.info[
+            "absolute"
+        ] = f"The absolute progress of this savefile is: {absolute_sum}/{total_sum} ({total}%)"
         logger.info(f"The sum of items needed to research is {research_sum}")
         logger.info(
             f"The absolute progress of this savefile is: {absolute_sum}/{total_sum} ({total}%)"
@@ -155,11 +167,16 @@ class Char:
                 continue
             except:
                 continue
+        self.info[
+            "easy"
+        ] = f"Items that can be easily researched are: \n {easy_research}"
         logger.info(f"Items that can be easily researched are: \n {easy_research}")
         return easy_research
 
     def get_progress_json(self):
-        return {}
+        with open("data/display.json", "w") as f:
+            json.dump(self.info, f, indent=4)
+        return
 
 
 def check_easy(item_id, researched):
@@ -175,3 +192,10 @@ def get_char(path=None):
     if path == None:
         path = PLAYER_FILE_PATH
     return Char(path)
+
+
+def fetch():
+    player = get_char(PLAYER_FILE_PATH)
+    player.get_partially_researched()
+    player.get_easy_researchs()
+    return player.info

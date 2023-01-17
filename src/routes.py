@@ -1,20 +1,20 @@
 from flask import jsonify
 from global_configs import PLAYER_FILE_PATH
+import json
 
 
-def setup_routes(app, memory_db):
+def setup_routes(app, player_info):
     @app.route("/config")
     def get_server_config():
         return jsonify(
-            {
-                "player_file_path": PLAYER_FILE_PATH,
-            }
+            {"player_file_path": PLAYER_FILE_PATH, "teste": player_info["partial"]}
         )
 
     @app.route("/player")
     def get_player():
-        last_player = memory_db.get_value("player")
-        if last_player == None:
+        with open("data/display.json", "r") as f:
+            display = json.load(f)
+        if display == None:
             return jsonify({"leleks": "leleks"})
 
-        return jsonify(last_player.get_progress_json())
+        return jsonify(display)
