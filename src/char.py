@@ -24,6 +24,9 @@ class Char:
         self.not_researched = []
         self.info: dict = {}
 
+        self.overview: dict = {}
+        self.easy: dict = {}
+
         logger.debug("Starting parse...")
 
         self.version = uint32(self.rbytes(4))
@@ -95,13 +98,12 @@ class Char:
 
         return string_return
 
-    def print_progress_overview(self):
+    def get_progress_overview(self):
         logger.info("==============================")
         progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
-        self.info["progress"] = f"Journey mode progress: {progress}%"
-        self.info[
-            "research"
-        ] = f"Researched {len(self.researched)} from {len(self.all_items)} total items"
+        self.overview["progress"] = progress
+        self.overview["researched"] = len(self.researched)
+        self.overview["partially"] = len(self.partially_researched)
         logger.info(f"Journey mode progress: {progress}%")
         logger.info(
             f"Researched {len(self.researched)} from {len(self.all_items)} total items"
@@ -145,10 +147,9 @@ class Char:
             logger.info(f"{name}: {item_progress}/{research_needed} ({progress}%) ")
             self.info[f"{name}"] = f": {item_progress}/{research_needed} ({progress}%) "
 
-        self.info["sum"] = f"The sum of items needed to research is {research_sum}"
-        self.info[
-            "absolute"
-        ] = f"The absolute progress of this savefile is: {absolute_sum}/{total_sum} ({total}%)"
+        self.info["sum"] = research_sum
+        self.info["absolute"] = total
+        self.info["absolute2"] = f"{absolute_sum}/{total_sum}"
         logger.info(f"The sum of items needed to research is {research_sum}")
         logger.info(
             f"The absolute progress of this savefile is: {absolute_sum}/{total_sum} ({total}%)"
@@ -167,9 +168,7 @@ class Char:
                 continue
             except:
                 continue
-        self.info[
-            "easy"
-        ] = f"Items that can be easily researched are: \n {easy_research}"
+        self.overview["easy"] = len(easy_research)
         logger.info(f"Items that can be easily researched are: \n {easy_research}")
         return easy_research
 
@@ -194,8 +193,10 @@ def get_char(path=None):
     return Char(path)
 
 
-def fetch():
+def fetch_player():
     player = get_char(PLAYER_FILE_PATH)
+    player.get_progress_overview()
     player.get_partially_researched()
     player.get_easy_researchs()
-    return player.info
+    print("the player sum is: ", player.info["sum"])
+    return player.info, player.overview
