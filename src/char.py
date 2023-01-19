@@ -12,6 +12,44 @@ from src.recipe_db import recipe_db
 import json
 
 
+def check_easy(item_id, researched):
+    item_recipe = recipe_db.recipes_list[item_id]
+    ingredients = [x["id"] for x in item_recipe.ingredients]
+    if all(y in researched for y in ingredients):
+        return True
+    return False
+
+
+def process_data(items_progress, partially_researched, researched, all_items):
+    tuplas: list = []
+    absolute: int = 0
+    research_sum: int = 0
+    total_sum: int = 0
+    logger.info("process data ok")
+    for id in partially_researched:
+        item = item_db.get_item(id)
+        research_sum += items_progress[id]
+        item_progress_percentage = round(
+            float(100 * items_progress[id] / item.research_needed), 2
+        )
+        tuplas.append(
+            (
+                item_progress_percentage,
+                item.name,
+                item.research_needed,
+                items_progress[id],
+            )
+        )
+    for id in researched:
+        absolute += items_progress[id]
+
+    absolute += research_sum
+
+    for id in all_items:
+        total_sum += id.research_needed
+    return tuplas, absolute, research_sum, total_sum
+
+
 class Char:
     def __init__(self, path) -> None:
         eraw: bytes = open(path, "rb").read()
@@ -21,13 +59,13 @@ class Char:
         self.items_progress: dict = {}
         self.researched = []
         self.partially_researched = []
-        self.not_researched = []
-        self.info: dict = {}
-
+        self.easy: dict = {}
+        self.absolute: int = 0
+        self.total_sum: int = 0
+        self.research_sum: int = 0
+        self.lista_tuplas: list = []
         self.overview: dict = {}
         self.easy: dict = {}
-
-        logger.debug("Starting parse...")
 
         self.version = uint32(self.rbytes(4))
         logger.debug(f"version: {self.version}")
@@ -79,6 +117,18 @@ class Char:
             if item.research_needed > research_progress:
                 self.partially_researched.append(item.id)
 
+        (
+            self.lista_tuplas,
+            self.absolute,
+            self.research_sum,
+            self.total_sum,
+        ) = process_data(
+            self.items_progress,
+            self.partially_researched,
+            self.researched,
+            self.all_items,
+        )
+
     def rbytes(self, n):
         return self.bytes[self.offset : self.offset + n]
 
@@ -98,93 +148,59 @@ class Char:
 
         return string_return
 
-    def get_progress_overview(self):
-        logger.info("==============================")
-        progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
-        self.overview["progress"] = progress
-        self.overview["researched"] = len(self.researched)
-        self.overview["partially"] = len(self.partially_researched)
-        logger.info(f"Journey mode progress: {progress}%")
-        logger.info(
-            f"Researched {len(self.researched)} from {len(self.all_items)} total items"
-        )
-
-        return
-
-    def get_partially_researched(self):
-        research_sum: int = 0
-        absolute_sum: int = 0
-        total_sum: int = 0
-        self.info["partial"] = f"Items partially researched: "
-        logger.info(f"Items partially researched: ")
-        lista_tuplas = []
-        for id in self.partially_researched:
-            item = item_db.get_item(id)
-            research_sum += self.items_progress[id]
-            item_progress_percentage = round(
-                float(100 * self.items_progress[id] / item.research_needed), 2
-            )
-            lista_tuplas.append(
-                (
-                    item_progress_percentage,
-                    item.name,
-                    item.research_needed,
-                    self.items_progress[id],
-                )
-            )
-        for id in self.researched:
-            absolute_sum += self.items_progress[id]
-
-        absolute_sum += research_sum
-
-        for id in self.all_items:
-            total_sum += id.research_needed
-
-        total = round(float(100 * absolute_sum / total_sum), 2)
-
-        lista_tuplas.sort(key=lambda a: a[0], reverse=True)
-        for progress, name, research_needed, item_progress in lista_tuplas:
-            logger.info(f"{name}: {item_progress}/{research_needed} ({progress}%) ")
-            self.info[f"{name}"] = f": {item_progress}/{research_needed} ({progress}%) "
-
-        self.info["sum"] = research_sum
-        self.info["absolute"] = total
-        self.info["absolute2"] = f"{absolute_sum}/{total_sum}"
-        logger.info(f"The sum of items needed to research is {research_sum}")
-        logger.info(
-            f"The absolute progress of this savefile is: {absolute_sum}/{total_sum} ({total}%)"
-        )
-
-        return
+    def get_partial(self):
+        partial: dict = {}
+        logger.info("eu entro no get partial")
+        self.lista_tuplas.sort(key=lambda a: a[0], reverse=True)
+        for progress, name, research_needed, item_progress in self.lista_tuplas:
+            partial[f"{name}"] = f": {item_progress}/{research_needed} ({progress}%) "
+        logger.info(partial, self.lista_tuplas)
+        return partial
 
     def get_easy_researchs(self):
-        easy_research = []
+        easy: dict = {}
         all_ids = [x.id for x in self.all_items]
         remaining = [y for y in all_ids if y not in self.researched]
         for id in remaining:
             try:
                 if check_easy(id, self.researched):
-                    easy_research.append(id)
+                    easy[f"{id}"] = item_db.get_item(id).wiki_url
                 continue
             except:
                 continue
-        self.overview["easy"] = len(easy_research)
-        logger.info(f"Items that can be easily researched are: \n {easy_research}")
-        return easy_research
+        self.overview["easy"] = len(easy)
+        return easy
 
-    def get_progress_json(self):
-        with open("data/display.json", "w") as f:
-            json.dump(self.info, f, indent=4)
-        return
+    def get_progress_overview(self):
+        overview: dict = {}
+        logger.info(f"overview type is: {type(overview)}")
+        progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
+        logger.info(f"o progress existe e é: {progress}")
+        overview = {
+            "progress": {
+                "big": progress,
+                "small": len(self.researched),
+                "small2": "items researched",
+            },
+            "not researched": {
+                "big": int(len(self.researched) - len(self.all_items)),
+                "small": "Items still need to be researched",
+            },
+            "partially": {
+                "big": len(self.partially_researched),
+                "small": "Items are partially researched",
+            },
+            "easy": {
+                "big": len(self.easy),
+                "small": "Itens can be crafted with things you already researched",
+            },
+            "absolute": {
+                "big": self.absolute,
+                "small": round(float(100 * self.absolute / self.total_sum), 2),
+            },
+        }
 
-
-def check_easy(item_id, researched):
-    # logger.info()
-    item_recipe = recipe_db.recipes_list[item_id]
-    ingredients = [x["id"] for x in item_recipe.ingredients]
-    if all(y in researched for y in ingredients):
-        return True
-    return False
+        return overview
 
 
 def get_char(path=None):
@@ -195,8 +211,8 @@ def get_char(path=None):
 
 def fetch_player():
     player = get_char(PLAYER_FILE_PATH)
-    player.get_progress_overview()
-    player.get_partially_researched()
-    player.get_easy_researchs()
-    print("the player sum is: ", player.info["sum"])
-    return player.info, player.overview
+    partial = player.get_partial()
+    easy = player.get_easy_researchs()
+    overview = player.get_progress_overview()
+
+    return partial, overview, easy
