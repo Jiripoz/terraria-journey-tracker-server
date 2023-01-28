@@ -19,9 +19,13 @@ def setup_routes(app, memory_db):
     def get_player():
         return jsonify(memory_db.partial)
 
-    @app.route("/easy")
-    def get_easy():
-        return jsonify(memory_db.easy)
+    @app.route("/items")
+    def get_items():
+        return jsonify(memory_db.items)
+
+    @app.route("/items-progress")
+    def get_researched():
+        return jsonify(memory_db.items_progress)
 
     # @app.route("/items")
     # def get_item():

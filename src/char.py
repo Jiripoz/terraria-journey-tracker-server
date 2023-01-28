@@ -158,45 +158,45 @@ class Char:
         return partial
 
     def get_easy_researchs(self):
-        easy: dict = {}
+        easy: list = []
         all_ids = [x.id for x in self.all_items]
         remaining = [y for y in all_ids if y not in self.researched]
         for id in remaining:
             try:
                 if check_easy(id, self.researched):
-                    easy[f"{id}"] = item_db.get_item(id).wiki_url
+                    easy.append(id)
                 continue
             except:
                 continue
         self.overview["easy"] = len(easy)
-        return easy
+        available = {"researched": self.researched, "easy": easy}
+
+        return available
 
     def get_progress_overview(self):
-        overview: dict = {}
-        logger.info(f"overview type is: {type(overview)}")
         progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
-        logger.info(f"o progress existe e é: {progress}")
-        overview = {
+        overview: dict = {
             "progress": {
                 "big": progress,
                 "small": len(self.researched),
-                "small2": "items researched",
+                "description": "items researched",
             },
-            "not researched": {
+            "not_researched": {
                 "big": int(len(self.researched) - len(self.all_items)),
-                "small": "Items still need to be researched",
+                "description": "Items still need to be researched",
             },
             "partially": {
                 "big": len(self.partially_researched),
-                "small": "Items are partially researched",
+                "description": "Items are partially researched",
             },
             "easy": {
                 "big": len(self.easy),
-                "small": "Itens can be crafted with things you already researched",
+                "description": "Itens can be crafted with things you already researched",
             },
             "absolute": {
                 "big": self.absolute,
                 "small": round(float(100 * self.absolute / self.total_sum), 2),
+                "description": "",
             },
         }
 
@@ -212,7 +212,7 @@ def get_char(path=None):
 def fetch_player():
     player = get_char(PLAYER_FILE_PATH)
     partial = player.get_partial()
-    easy = player.get_easy_researchs()
+    items_progress = player.get_easy_researchs()
     overview = player.get_progress_overview()
 
-    return partial, overview, easy
+    return partial, overview, items_progress

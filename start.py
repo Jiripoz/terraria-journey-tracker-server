@@ -13,7 +13,6 @@ memory_db.update_stats()
 
 
 def main_loop():
-    global player_info
     memory_db.update_stats()
 
 
