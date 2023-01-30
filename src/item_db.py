@@ -53,11 +53,7 @@ class ItemDB:
 
     # Kinda slow
     def get_item_by_internal_name(self, internal_name: str) -> Item:
-        return [
-            item
-            for item in self.items_dict.values()
-            if item.internal_name == internal_name
-        ][0]
+        return [item for item in self.items_dict.values() if item.internal_name == internal_name][0]
 
     def get_item_by_name(self, name: str) -> Item:
         return [item for item in self.items_dict.values() if item.name == name][0]

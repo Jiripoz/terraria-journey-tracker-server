@@ -16,9 +16,7 @@ def main_loop():
     memory_db.update_stats()
 
 
-t1 = threading.Thread(
-    target=lambda: setup_watchdog(PLAYER_FILE_PATH, main_loop), daemon=True
-)
+t1 = threading.Thread(target=lambda: setup_watchdog(PLAYER_FILE_PATH, main_loop), daemon=True)
 t1.start()
 
 
