@@ -20,26 +20,41 @@ def check_easy(item_id, researched):
     return False
 
 
-def process_data(items_progress, partially_researched, researched, all_items):
+def get_easy_researchs(all_items, researched):
+    easy: list = []
+    all_ids = [x.id for x in all_items]
+    remaining = [y for y in all_ids if y not in researched]
+    for id in remaining:
+        try:
+            if check_easy(id, researched):
+                easy.append(id)
+            continue
+        except:
+            continue
+    return easy
+
+
+def process_data(items_progress, partially_researched, researched, all_items, easy):
     tuplas: list = []
     absolute: int = 0
     research_sum: int = 0
     total_sum: int = 0
-    logger.info("process data ok")
+    boolean_handler: bool = False
+
     for id in partially_researched:
+        if id in easy:
+            boolean_handler = True
         item = item_db.get_item(id)
         research_sum += items_progress[id]
-        item_progress_percentage = round(
-            float(100 * items_progress[id] / item.research_needed), 2
-        )
         tuplas.append(
             (
-                item_progress_percentage,
-                item.name,
-                item.research_needed,
+                item.id,
                 items_progress[id],
+                boolean_handler,
             )
         )
+        boolean_handler = False
+
     for id in researched:
         absolute += items_progress[id]
 
@@ -48,6 +63,37 @@ def process_data(items_progress, partially_researched, researched, all_items):
     for id in all_items:
         total_sum += id.research_needed
     return tuplas, absolute, research_sum, total_sum
+
+
+def get_partial(lista_tuplas, easy):
+    partial: list = []
+    lista_tuplas.sort(key=lambda a: a[0], reverse=True)
+    for id, item_progress, easy in lista_tuplas:
+        partial.append(
+            {
+                "id": id,
+                "item_progress": item_progress,
+                "easy": easy,
+            }
+        )
+    logger.info(partial)
+    return partial
+
+
+def get_remaining(all_items, easy, partial, researched):
+    not_researched: list = []
+    all_ids = [x.id for x in all_items]
+    not_researched_id = [id for id in [id for id in all_ids if id not in partial] if id not in researched]
+
+    for id in not_researched_id:
+        not_researched.append(
+            {
+                "id": id,
+                "easy": id in easy,
+            }
+        )
+
+    return not_researched
 
 
 class Char:
@@ -59,13 +105,14 @@ class Char:
         self.items_progress: dict = {}
         self.researched = []
         self.partially_researched = []
-        self.easy: dict = {}
         self.absolute: int = 0
         self.total_sum: int = 0
         self.research_sum: int = 0
         self.lista_tuplas: list = []
         self.overview: dict = {}
-        self.easy: dict = {}
+        self.easy: list = []
+        self.partial: list = []
+        self.not_researched: list = []
 
         self.version = uint32(self.rbytes(4))
         logger.debug(f"version: {self.version}")
@@ -108,26 +155,22 @@ class Char:
             if not item:
                 logger.error(f"Oooops! We are missing item {item_internal_name}")
 
-            logger.debug(
-                f"Researched {research_progress}/{item.research_needed} of {item.name}"
-            )
+            logger.debug(f"Researched {research_progress}/{item.research_needed} of {item.name}")
             self.items_progress[item.id] = research_progress
             if item.research_needed == research_progress:
                 self.researched.append(item.id)
             if item.research_needed > research_progress:
                 self.partially_researched.append(item.id)
-
-        (
-            self.lista_tuplas,
-            self.absolute,
-            self.research_sum,
-            self.total_sum,
-        ) = process_data(
+        self.easy = get_easy_researchs(self.all_items, self.researched)
+        (self.lista_tuplas, self.absolute, self.research_sum, self.total_sum,) = process_data(
             self.items_progress,
             self.partially_researched,
             self.researched,
             self.all_items,
+            self.easy,
         )
+        self.partial = get_partial(self.lista_tuplas, self.easy)
+        self.not_researched = get_remaining(self.all_items, self.easy, self.partial, self.researched)
 
     def rbytes(self, n):
         return self.bytes[self.offset : self.offset + n]
@@ -148,32 +191,15 @@ class Char:
 
         return string_return
 
-    def get_partial(self):
-        partial: dict = {}
-        logger.info("eu entro no get partial")
-        self.lista_tuplas.sort(key=lambda a: a[0], reverse=True)
-        for progress, name, research_needed, item_progress in self.lista_tuplas:
-            partial[f"{name}"] = f": {item_progress}/{research_needed} ({progress}%) "
-        logger.info(partial, self.lista_tuplas)
-        return partial
-
-    def get_easy_researchs(self):
-        easy: list = []
-        all_ids = [x.id for x in self.all_items]
-        remaining = [y for y in all_ids if y not in self.researched]
-        for id in remaining:
-            try:
-                if check_easy(id, self.researched):
-                    easy.append(id)
-                continue
-            except:
-                continue
-        self.overview["easy"] = len(easy)
-        available = {"researched": self.researched, "easy": easy}
-
+    def get_items_progress(self):
+        available = {
+            "researched": self.researched,  # ok
+            "notInProgress": self.not_researched,  # ok
+            "inProgress": self.partial,  # ok
+        }
         return available
 
-    def get_progress_overview(self):
+    def get_overview(self):
         progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
         overview: dict = {
             "progress": {
@@ -182,10 +208,10 @@ class Char:
                 "description": "items researched",
             },
             "not_researched": {
-                "big": int(len(self.researched) - len(self.all_items)),
+                "big": int(len(self.all_items) - len(self.researched)),
                 "description": "Items still need to be researched",
             },
-            "partially": {
+            "partially_researched": {
                 "big": len(self.partially_researched),
                 "description": "Items are partially researched",
             },
@@ -211,8 +237,7 @@ def get_char(path=None):
 
 def fetch_player():
     player = get_char(PLAYER_FILE_PATH)
-    partial = player.get_partial()
-    items_progress = player.get_easy_researchs()
-    overview = player.get_progress_overview()
+    items_progress = player.get_items_progress()
+    overview = player.get_overview()
 
-    return partial, overview, items_progress
+    return overview, items_progress

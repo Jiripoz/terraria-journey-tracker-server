@@ -27,6 +27,7 @@ class Item:
 class ItemDB:
     def __init__(self, items: list):
         self.items_dict = {}
+        self.raw_dict = items
 
         for item in items:
             self.items_dict[item["id"]] = Item(
