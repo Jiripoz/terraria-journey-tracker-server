@@ -1,3 +1,4 @@
+import data.fetch_items
 from global_configs import PLAYER_FILE_PATH, VERBOSE
 from src.log_setup import logger
 from src.char import get_char
