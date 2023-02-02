@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 from global_configs import PLAYER_FILE_PATH, VERBOSE, PORT
+=======
+import data.fetch_items
+from global_configs import PLAYER_FILE_PATH, VERBOSE
+>>>>>>> 92b2d52d47fc4c4d5766387c98142e6cd1d45609
 from src.log_setup import logger
 from src.cachorro import setup_watchdog
 import threading
