@@ -19,12 +19,6 @@ class Recipe:
         return f"item name: {self.name}, id: {self.id}, station: {self.station}"
 
 
-def get_ingredients(r):
-    lst = [x for x in re.split("[Â|^|¦]", r["args"]) if x != ""]
-    ing_dct = {lst[i]: lst[i + 1] for i in range(0, len(lst), 2)}
-    return ing_dct
-
-
 class RecipeDB:
     def __init__(self, recipes: list):
         self.recipes_list = {}
