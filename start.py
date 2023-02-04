@@ -16,13 +16,10 @@ def main_loop():
     memory_db.update_stats()
 
 
-t1 = threading.Thread(
-    target=lambda: setup_watchdog(PLAYER_FILE_PATH, main_loop), daemon=True
-)
+t1 = threading.Thread(target=lambda: setup_watchdog(PLAYER_FILE_PATH, main_loop), daemon=True)
 t1.start()
 
 
 app, socketio = setup_server(memory_db)
 main_loop()
-
 socketio.run(app, port=PORT)
