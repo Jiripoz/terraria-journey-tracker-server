@@ -9,6 +9,94 @@ from src.item_db import item_db
 from global_configs import PLAYER_FILE_PATH
 from src.log_setup import logger
 from src.recipe_db import recipe_db
+import json
+import time
+
+
+def check_easy(item_id, researched):
+    item_recipe = recipe_db.recipes_list[item_id]
+    ingredients = [x["id"] for x in item_recipe.ingredients]
+    if all(y in researched for y in ingredients):
+        return True
+    return False
+
+
+def get_easy_researchs(all_items, researched):
+    easy: list = []
+    all_ids = [x.id for x in all_items]
+    remaining = [y for y in all_ids if y not in researched]
+    for id in remaining:
+        try:
+            if check_easy(id, researched):
+                easy.append(id)
+            continue
+        except:
+            continue
+    return easy
+
+
+def process_data(items_progress, partially_researched, researched, all_items, easy):
+    tuplas: list = []
+    absolute: int = 0
+    research_sum: int = 0
+    total_sum: int = 0
+    boolean_handler: bool = False
+
+    for id in partially_researched:
+        if id in easy:
+            boolean_handler = True
+        item = item_db.get_item(id)
+        research_sum += items_progress[id]
+        tuplas.append(
+            (
+                item.id,
+                items_progress[id],
+                boolean_handler,
+            )
+        )
+        boolean_handler = False
+
+    for id in researched:
+        absolute += items_progress[id]
+
+    absolute += research_sum
+
+    for id in all_items:
+        total_sum += id.research_needed
+    return tuplas, absolute, research_sum, total_sum
+
+
+def get_partial(lista_tuplas, easy):
+    partial: list = []
+    lista_tuplas.sort(key=lambda a: a[0], reverse=True)
+    for id, item_progress, easy in lista_tuplas:
+        partial.append(
+            {
+                "id": id,
+                "item_progress": item_progress,
+                "easy": easy,
+            }
+        )
+    logger.info(partial)
+    return partial
+
+
+def get_remaining(all_items, easy, partial, researched):
+    not_researched: list = []
+    all_ids = [x.id for x in all_items]
+    not_researched_id = [
+        id for id in [id for id in all_ids if id not in partial] if id not in researched
+    ]
+
+    for id in not_researched_id:
+        not_researched.append(
+            {
+                "id": id,
+                "easy": id in easy,
+            }
+        )
+
+    return not_researched
 
 
 class Char:
@@ -59,9 +147,7 @@ class Char:
 
             research_progress = int32(self.rbytes(4))
             self.offset += 4
-
             item = item_db.get_item_by_internal_name(item_internal_name)
-
             if not item:
                 logger.error(f"Oooops! We are missing item {item_internal_name}")
 
