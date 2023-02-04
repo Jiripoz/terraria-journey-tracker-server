@@ -6,51 +6,87 @@ from src.log_setup import logger
 import traceback
 
 
-# logger.debug("Running fetch_items.py...")
+logger.debug("Running fetch_items.py...")
 
 
-# API = "https://terraria.wiki.gg//api.php"
+API = "https://terraria.fandom.com//api.php"
+API2 = "https://terraria.wiki.gg/api.php"
 
-# PARAMS = {
-#     "action": "cargoquery",
-#     "format": "json",
-#     "tables": "Items",
-#     "fields": "itemid, name, internalname, imagefile, consumable, hardmode, type, tag, rare, tooltip, research",
-#     "offset": 0,
-# }
-
-
-# session = requests.Session()
-# request = session.get(url=API, params=PARAMS)
-# DATA = request.json()
-# final = []
-
-# while DATA["cargoquery"] != []:
-#     try:
-#         for item in DATA["cargoquery"]:
-#             item_dict = item["title"]
-#             image_file = item_dict["imagefile"].replace(" ", "_")
-#             hash = hashlib.md5(image_file.encode()).hexdigest()
-#             item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
-#             item_dict["imageUrl"] = item_url
-#             final.append(item_dict)
-#             print(f"o item url é {item_url}")
-
-#         PARAMS["offset"] += 50
-#         request = session.get(url=API, params=PARAMS)
-#         DATA = request.json()
-
-#     except Exception as e:
-#         print(e)
-#         traceback.print_stack
-#         break
+PARAMS = {
+    "action": "cargoquery",
+    "format": "json",
+    "tables": "Items",
+    "fields": "itemid, name, internalname, imagefile, consumable, hardmode, type, tag, rare, tooltip, research",
+    "offset": 0,
+    "limit": 1000000000,
+}
 
 
-# with open("data/raw_item.json", "w") as f:
-#     json.dump(final, f, indent=4)
+session = requests.Session()
+request = session.get(url=API, params=PARAMS)
+DATA = request.json()
+final = []
+
+while DATA["cargoquery"] != []:
+    try:
+        for item in DATA["cargoquery"]:
+            item_dict = item["title"]
+            image_file = item_dict["imagefile"].replace(" ", "_")
+            hash = hashlib.md5(image_file.encode()).hexdigest()
+            item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
+            item_dict["imageUrl"] = item_url
+            final.append(item_dict)
+
+        PARAMS["offset"] += 49
+        print(PARAMS["offset"])
+        request = session.get(url=API, params=PARAMS)
+        DATA = request.json()
+
+    except Exception as e:
+        print(e)
+        traceback.print_stack
+        break
+
+session = requests.Session()
+PARAMS["offset"] = 0
+request = session.get(url=API2, params=PARAMS)
+DATA = request.json()
+
+
+while DATA["cargoquery"] != []:
+    try:
+        for item in DATA["cargoquery"]:
+            item_dict = item["title"]
+            image_file = item_dict["imagefile"].replace(" ", "_")
+            hash = hashlib.md5(image_file.encode()).hexdigest()
+            item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
+            item_dict["imageUrl"] = item_url
+            final.append(item_dict)
+
+        PARAMS["offset"] += 49
+        print(PARAMS["offset"])
+        request = session.get(url=API2, params=PARAMS)
+        DATA = request.json()
+
+    except Exception as e:
+        print(e)
+        traceback.print_stack
+        break
+
+
+with open("data/raw_item.json", "w") as f:
+    json.dump(final, f, indent=4)
 
 with open("data/raw_item.json", "r") as f:
     raw_items = json.load(f)
+
+
+def search_duplicate_id(sub):
+    id_list = []
+    for item in sub:
+        id_list.append(item["id"])
+    duplicates = set(i for i in id_list if id_list.count(i) > 1)
+    return duplicates
 
 
 def switch_to_boolean(obj):
@@ -92,7 +128,7 @@ def transform_composite_labels(lst):
 
 def clean_tooltip(tooltip):
     if tooltip == None:
-        return
+        return ""
     fclean = (
         tooltip.replace("&lt;span class=&quot;gameText&quot;&gt;", "")
         .replace("&lt;/span&gt;", "")
@@ -102,14 +138,32 @@ def clean_tooltip(tooltip):
     return fclean
 
 
+def has_research(research):
+    try:
+        int(item["research"])
+    except:
+        return False
+    return research != None
+
+
+def check_internalName(internalName):
+    if internalName == "EldMelter":
+        return "ElfMelter"
+    return internalName
+
+
+added_ids = {}
 all_tags = []
 final: list = []
 for item in raw_items:
-    if item["itemid"] == None:
+    if (
+        item["itemid"] == None
+        or not has_research(item["research"])
+        or item["itemid"] in added_ids
+    ):
         continue
     item["id"] = item["itemid"]
-    item["internalName"] = item["internalname"]
-
+    item["internalName"] = check_internalName(item["internalname"])
     item["hardmode"] = switch_to_boolean(item["consumable"])
     item["consumable"] = switch_to_boolean(item["consumable"])
     item["type"] = type_to_list(item["type"])
@@ -117,14 +171,21 @@ for item in raw_items:
     item["tooltip"] = clean_tooltip(item["tooltip"])
     item.update(prop_dict)
     all_tags.extend(type_to_list(item["tag"]))
+
     item["category"] = item["type"]
+    item["itemUrl"] = item["name"].replace(" ", "_")
+    item["research"] = int(item["research"])
 
     del item["tag"]
     del item["itemid"]
     del item["type"]
     del item["internalname"]
+
+    added_ids[item["id"]] = True
     final.append(item)
 
+
+duplicates = search_duplicate_id(final)
 
 with open("data/items.json", "w") as g:
     json.dump(final, g, indent=4)

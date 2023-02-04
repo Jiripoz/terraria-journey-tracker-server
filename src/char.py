@@ -149,9 +149,7 @@ class Char:
 
             research_progress = int32(self.rbytes(4))
             self.offset += 4
-
             item = item_db.get_item_by_internal_name(item_internal_name)
-
             if not item:
                 logger.error(f"Oooops! We are missing item {item_internal_name}")
 
