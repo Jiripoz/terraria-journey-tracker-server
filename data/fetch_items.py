@@ -131,6 +131,12 @@ def clean_tooltip(tooltip):
         tooltip.replace("&lt;span class=&quot;gameText&quot;&gt;", "")
         .replace("&lt;/span&gt;", "")
         .replace("&lt;br/&gt;", ". ")
+        .replace(
+            "&lt;span class=&quot;eico s i0 i1 i4 i7 i9 i10&quot; title=&quot;PC, Console, Mobile, Old Chinese, tModLoader and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;. Shows depth &lt;span class=&quot;eico s i2 i5 i8&quot; title=&quot;Old-gen console, Windows Phone and 3DS versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;",
+            "",
+        )
+        .replace("&lt;span class=&quot;eico s i0 i1 i4 i9&quot; title=&quot;PC, Console, Mobile and tModLoader versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;", "")
+        .replace("&lt;span class=&quot;eico s i2 i5 i7 i10&quot; title=&quot;Old-gen console, Windows Phone, Old Chinese and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;", "")
     )
 
     return fclean

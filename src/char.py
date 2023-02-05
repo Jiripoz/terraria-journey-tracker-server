@@ -84,7 +84,7 @@ def get_partial(lista_tuplas, easy):
 
 def get_remaining(all_items, easy, partial, researched):
     not_researched: list = []
-    all_ids = [x.id for x in all_items]
+    all_ids = [int(x.id) for x in all_items]
     not_researched_id = [id for id in [id for id in all_ids if id not in partial] if id not in researched]
 
     for id in not_researched_id:
