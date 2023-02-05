@@ -9,22 +9,28 @@ from src.item_db import item_db
 from global_configs import PLAYER_FILE_PATH
 from src.log_setup import logger
 from src.recipe_db import recipe_db
-import json
 
 
 def check_easy(item_id, researched):
     item_recipe = recipe_db.recipes_list[item_id]
     ingredients = [x["id"] for x in item_recipe.ingredients]
-    if all(y in researched for y in ingredients):
-        return True
-    return False
+    for y in ingredients:
+        if type(y) == list:
+            for w in y:
+                if w not in researched:
+                    return False
+        if y not in researched:
+            return False
+
+    return True
 
 
 def get_easy_researchs(all_items, researched):
     easy: list = []
-    all_ids = [x.id for x in all_items]
-    remaining = [y for y in all_ids if y not in researched]
+    all_ids = [int(x.id) for x in all_items]
+    remaining = [int(y) for y in all_ids if int(y) not in researched]
     for id in remaining:
+
         try:
             if check_easy(id, researched):
                 easy.append(id)
@@ -39,24 +45,20 @@ def process_data(items_progress, partially_researched, researched, all_items, ea
     absolute: int = 0
     research_sum: int = 0
     total_sum: int = 0
-    boolean_handler: bool = False
 
     for id in partially_researched:
-        if id in easy:
-            boolean_handler = True
         item = item_db.get_item(id)
         research_sum += items_progress[id]
         tuplas.append(
             (
                 item.id,
                 items_progress[id],
-                boolean_handler,
+                int(id) in easy,
             )
         )
-        boolean_handler = False
 
     for id in researched:
-        absolute += items_progress[id]
+        absolute += items_progress[str(id)]
 
     absolute += research_sum
 
@@ -89,7 +91,7 @@ def get_remaining(all_items, easy, partial, researched):
         not_researched.append(
             {
                 "id": id,
-                "easy": id in easy,
+                "easy": int(id) in easy,
             }
         )
 
@@ -156,7 +158,7 @@ class Char:
             logger.debug(f"Researched {research_progress}/{item.research_needed} of {item.name}")
             self.items_progress[item.id] = research_progress
             if item.research_needed == research_progress:
-                self.researched.append(item.id)
+                self.researched.append(int(item.id))
             if item.research_needed > research_progress:
                 self.partially_researched.append(item.id)
         self.easy = get_easy_researchs(self.all_items, self.researched)

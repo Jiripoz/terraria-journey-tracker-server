@@ -6,76 +6,74 @@ from src.log_setup import logger
 import traceback
 
 
-logger.debug("Running fetch_items.py...")
+# logger.debug("Running fetch_items.py...")
 
 
-API = "https://terraria.fandom.com//api.php"
-API2 = "https://terraria.wiki.gg/api.php"
+# API = "https://terraria.fandom.com//api.php"
+# API2 = "https://terraria.wiki.gg/api.php"
 
-PARAMS = {
-    "action": "cargoquery",
-    "format": "json",
-    "tables": "Items",
-    "fields": "itemid, name, internalname, imagefile, consumable, hardmode, type, tag, rare, tooltip, research",
-    "offset": 0,
-    "limit": 1000000000,
-}
-
-
-session = requests.Session()
-request = session.get(url=API, params=PARAMS)
-DATA = request.json()
-final = []
-
-while DATA["cargoquery"] != []:
-    try:
-        for item in DATA["cargoquery"]:
-            item_dict = item["title"]
-            image_file = item_dict["imagefile"].replace(" ", "_")
-            hash = hashlib.md5(image_file.encode()).hexdigest()
-            item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
-            item_dict["imageUrl"] = item_url
-            final.append(item_dict)
-
-        PARAMS["offset"] += 49
-        print(PARAMS["offset"])
-        request = session.get(url=API, params=PARAMS)
-        DATA = request.json()
-
-    except Exception as e:
-        print(e)
-        traceback.print_stack
-        break
-
-session = requests.Session()
-PARAMS["offset"] = 0
-request = session.get(url=API2, params=PARAMS)
-DATA = request.json()
+# PARAMS = {
+#     "action": "cargoquery",
+#     "format": "json",
+#     "tables": "Items",
+#     "fields": "itemid, name, internalname, imagefile, consumable, hardmode, type, tag, rare, tooltip, research",
+#     "offset": 0,
+#     "limit": 1000000000,
+# }
 
 
-while DATA["cargoquery"] != []:
-    try:
-        for item in DATA["cargoquery"]:
-            item_dict = item["title"]
-            image_file = item_dict["imagefile"].replace(" ", "_")
-            hash = hashlib.md5(image_file.encode()).hexdigest()
-            item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
-            item_dict["imageUrl"] = item_url
-            final.append(item_dict)
+# session = requests.Session()
+# request = session.get(url=API, params=PARAMS)
+# DATA = request.json()
+# final = []
 
-        PARAMS["offset"] += 49
-        print(PARAMS["offset"])
-        request = session.get(url=API2, params=PARAMS)
-        DATA = request.json()
+# while DATA["cargoquery"] != []:
+#     try:
+#         for item in DATA["cargoquery"]:
+#             item_dict = item["title"]
+#             image_file = item_dict["imagefile"].replace(" ", "_")
+#             hash = hashlib.md5(image_file.encode()).hexdigest()
+#             item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
+#             item_dict["imageUrl"] = item_url
+#             final.append(item_dict)
 
-    except Exception as e:
-        print(e)
-        traceback.print_stack
-        break
+#         PARAMS["offset"] += 49
+#         request = session.get(url=API, params=PARAMS)
+#         DATA = request.json()
+#         print(PARAMS["offset"])
+#     except Exception as e:
+#         print(e)
+#         traceback.print_stack
+#         break
+
+# session = requests.Session()
+# PARAMS["offset"] = 0
+# request = session.get(url=API2, params=PARAMS)
+# DATA = request.json()
 
 
-with open("data/raw_item.json", "w") as f:
-    json.dump(final, f, indent=4)
+# while DATA["cargoquery"] != []:
+#     try:
+#         for item in DATA["cargoquery"]:
+#             item_dict = item["title"]
+#             image_file = item_dict["imagefile"].replace(" ", "_")
+#             hash = hashlib.md5(image_file.encode()).hexdigest()
+#             item_url = f"https://terraria.wiki.gg/images/{hash[0]}/{hash[0]}{hash[1]}/{image_file}"
+#             item_dict["imageUrl"] = item_url
+#             final.append(item_dict)
+
+#         PARAMS["offset"] += 49
+#         request = session.get(url=API2, params=PARAMS)
+#         DATA = request.json()
+#         print(PARAMS["offset"])
+#     except Exception as e:
+#         print(e)
+#         traceback.print_stack
+#         break
+
+
+# with open("data/raw_item.json", "w") as f:
+#     json.dump(final, f, indent=4)
 
 with open("data/raw_item.json", "r") as f:
     raw_items = json.load(f)
@@ -156,11 +154,7 @@ added_ids = {}
 all_tags = []
 final: list = []
 for item in raw_items:
-    if (
-        item["itemid"] == None
-        or not has_research(item["research"])
-        or item["itemid"] in added_ids
-    ):
+    if item["itemid"] == None or not has_research(item["research"]) or item["itemid"] in added_ids:
         continue
     item["id"] = item["itemid"]
     item["internalName"] = check_internalName(item["internalname"])
@@ -183,9 +177,6 @@ for item in raw_items:
 
     added_ids[item["id"]] = True
     final.append(item)
-
-
-duplicates = search_duplicate_id(final)
 
 with open("data/items.json", "w") as g:
     json.dump(final, g, indent=4)

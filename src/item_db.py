@@ -12,7 +12,7 @@ ITEMS_JSON_PATH = str(path.join(path.abspath(os.getcwd()), "data", "items.json")
 
 @dataclass
 class Item:
-    id: str
+    id: int
     name: str
     internal_name: str
     wiki_url: str
@@ -34,10 +34,10 @@ class ItemDB:
                 id=item["id"],
                 name=item["name"],
                 internal_name=item["internalName"],
-                wiki_url=WIKI_ROOT_URL + item["itemUrl"],
+                wiki_url=WIKI_ROOT_URL + item["imagefile"],
                 image_url=IMAGE_ROOT_URL + item["imageUrl"],
                 category=item["category"],
-                research_needed=item["research"],
+                research_needed=int(item["research"]),
             )
 
     def get_item(self, item_id: int) -> Item:
