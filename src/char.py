@@ -63,7 +63,7 @@ def process_data(items_progress, partially_researched, researched, all_items, ea
     absolute += research_sum
 
     for id in all_items:
-        total_sum += id.research_needed
+        total_sum += id.research
     return tuplas, absolute, research_sum, total_sum
 
 
@@ -143,23 +143,23 @@ class Char:
 
         # Get item research progress
         while True:
-            item_internal_name = self.read_string()
+            item_internalName = self.read_string()
 
-            if item_internal_name == "":
+            if item_internalName == "":
                 logger.debug("Stopped reading Journey")
                 break
 
             research_progress = int32(self.rbytes(4))
             self.offset += 4
-            item = item_db.get_item_by_internal_name(item_internal_name)
+            item = item_db.get_item_by_internal_name(item_internalName)
             if not item:
-                logger.error(f"Oooops! We are missing item {item_internal_name}")
+                logger.error(f"Oooops! We are missing item {item_internalName}")
 
-            logger.debug(f"Researched {research_progress}/{item.research_needed} of {item.name}")
+            logger.debug(f"Researched {research_progress}/{item.research} of {item.name}")
             self.items_progress[item.id] = research_progress
-            if item.research_needed == research_progress:
+            if item.research == research_progress:
                 self.researched.append(int(item.id))
-            if item.research_needed > research_progress:
+            if item.research > research_progress:
                 self.partially_researched.append(item.id)
         self.easy = get_easy_researchs(self.all_items, self.researched)
         (self.lista_tuplas, self.absolute, self.research_sum, self.total_sum,) = process_data(
@@ -203,7 +203,7 @@ class Char:
         progress = round(float(100 * len(self.researched) / len(self.all_items)), 2)
         overview: dict = {
             "progress": {
-                "big": progress,
+                "big": str(progress) + "%",
                 "small": len(self.researched),
                 "description": "items researched",
             },
@@ -221,8 +221,8 @@ class Char:
             },
             "absolute": {
                 "big": self.absolute,
-                "small": round(float(100 * self.absolute / self.total_sum), 2),
-                "description": "",
+                "small": str(round(float(100 * self.absolute / self.total_sum), 2)) + "%",
+                "description": " of total blocks needed",
             },
         }
 

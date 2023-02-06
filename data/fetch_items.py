@@ -135,8 +135,22 @@ def clean_tooltip(tooltip):
             "&lt;span class=&quot;eico s i0 i1 i4 i7 i9 i10&quot; title=&quot;PC, Console, Mobile, Old Chinese, tModLoader and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;. Shows depth &lt;span class=&quot;eico s i2 i5 i8&quot; title=&quot;Old-gen console, Windows Phone and 3DS versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;",
             "",
         )
-        .replace("&lt;span class=&quot;eico s i0 i1 i4 i9&quot; title=&quot;PC, Console, Mobile and tModLoader versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;", "")
-        .replace("&lt;span class=&quot;eico s i2 i5 i7 i10&quot; title=&quot;Old-gen console, Windows Phone, Old Chinese and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;", "")
+        .replace(
+            "&lt;span class=&quot;eico s i0 i1 i4 i9&quot; title=&quot;PC, Console, Mobile and tModLoader versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;",
+            "",
+        )
+        .replace(
+            "&lt;span class=&quot;eico s i2 i5 i7 i10&quot; title=&quot;Old-gen console, Windows Phone, Old Chinese and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;",
+            "",
+        )
+        .replace(
+            "&lt;span class=&quot;eico s i0 i1 i4 i7 i9 i10&quot; title=&quot;PC, Console, Mobile, Old Chinese, tModLoader and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt; . Opens one Gold Chest &lt;span class=&quot;eico s i2 i5 i8&quot; title=&quot;Old-gen console, Windows Phone and 3DS versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt;",
+            "",
+        )
+        .replace(
+            "&lt;span class=&quot;eico s i0 i1 i2 i4 i7 i9 i10&quot; title=&quot;PC, Console, Old-gen console, Mobile, Old Chinese, tModLoader and tModLoader 1.3-Legacy versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt; Can mine Mythril and Orichalcum. &lt;span class=&quot;eico s i5 i8&quot; title=&quot;Windows Phone and 3DS versions&quot;&gt;&lt;b&gt;&lt;/b&gt;&lt;i&gt;&lt;/i&gt; Can mine Mythril, Orichalcum, Adamantite, and Titanium",
+            "",
+        )
     )
 
     return fclean
@@ -156,35 +170,34 @@ def check_internalName(internalName):
     return internalName
 
 
-added_ids = {}
-all_tags = []
-final: list = []
+new_item_dict = {}
+
+added_ids: dict = {}
+all_tags: list = []
 for item in raw_items:
     if item["itemid"] == None or not has_research(item["research"]) or item["itemid"] in added_ids:
         continue
-    item["id"] = item["itemid"]
-    item["internalName"] = check_internalName(item["internalname"])
-    item["hardmode"] = switch_to_boolean(item["consumable"])
-    item["consumable"] = switch_to_boolean(item["consumable"])
-    item["type"] = type_to_list(item["type"])
+
     item["tags"], prop_dict = transform_composite_labels(type_to_list(item["tag"]))
-    item["tooltip"] = clean_tooltip(item["tooltip"])
-    item.update(prop_dict)
-    all_tags.extend(type_to_list(item["tag"]))
+    new_item_dict[int(item["itemid"])] = {
+        "name": item["name"],
+        "imagefile": item["imagefile"],
+        "consumable": switch_to_boolean(item["consumable"]),
+        "hardmode": switch_to_boolean(item["hardmode"]),
+        "rare": item["rare"],
+        "tooltip": clean_tooltip(item["tooltip"]),
+        "research": int(item["research"]),
+        "imageUrl": item["imageUrl"],
+        "internalName": check_internalName(item["internalname"]),
+        "tags": item["tags"],
+        "category": type_to_list(item["type"]),
+        "itemUrl": item["name"].replace(" ", "_"),
+    }
+    new_item_dict[int(item["itemid"])].update(prop_dict)
 
-    item["category"] = item["type"]
-    item["itemUrl"] = item["name"].replace(" ", "_")
-    item["research"] = int(item["research"])
-
-    del item["tag"]
-    del item["itemid"]
-    del item["type"]
-    del item["internalname"]
-
-    added_ids[item["id"]] = True
-    final.append(item)
+    added_ids[item["itemid"]] = True
 
 with open("data/items.json", "w") as g:
-    json.dump(final, g, indent=4)
+    json.dump(new_item_dict, g, indent=4)
 
 logger.debug("Done! Items saved in data folder as items.json and raw_items.json")
