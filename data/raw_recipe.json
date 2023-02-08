@@ -2208,12 +2208,6 @@
         "args": "Blue Phaseblade\u00a61^Crystal Shard\u00a625"
     },
     {
-        "result": "Blue Phasesaber",
-        "resultid": "3764",
-        "station": "Mythril Anvil",
-        "args": "Blue Phaseblade\u00a61^Crystal Shard\u00a650"
-    },
-    {
         "result": "Blue Slab Wall",
         "resultid": "1378",
         "station": "Heavy Work Bench",
@@ -7083,12 +7077,6 @@
         "result": "Glass",
         "resultid": "170",
         "station": "Work Bench",
-        "args": "Glass Platform\u00a62"
-    },
-    {
-        "result": "Glass",
-        "resultid": "170",
-        "station": "Work Bench",
         "args": "Glass Wall\u00a64"
     },
     {
@@ -7197,12 +7185,6 @@
         "result": "Glass Platform",
         "resultid": "1702",
         "station": "By Hand",
-        "args": "Glass\u00a61"
-    },
-    {
-        "result": "Glass Platform",
-        "resultid": "1702",
-        "station": "Work Bench",
         "args": "Glass\u00a61"
     },
     {
@@ -8170,12 +8152,6 @@
         "resultid": "3766",
         "station": "Mythril Anvil",
         "args": "Green Phaseblade\u00a61^Crystal Shard\u00a625"
-    },
-    {
-        "result": "Green Phasesaber",
-        "resultid": "3766",
-        "station": "Mythril Anvil",
-        "args": "Green Phaseblade\u00a61^Crystal Shard\u00a650"
     },
     {
         "result": "Green Slab Wall",
@@ -9556,6 +9532,12 @@
         "resultid": "1860",
         "station": "Tinkerer's Workshop",
         "args": "Diving Gear\u00a61^Jellyfish Necklace\u00a61"
+    },
+    {
+        "result": "Jester's Arrow",
+        "resultid": "51",
+        "station": "By Hand",
+        "args": "Wooden Arrow\u00a610^Fallen Star\u00a61"
     },
     {
         "result": "Julia Butterfly Jar",
@@ -11296,12 +11278,6 @@
         "resultid": "984",
         "station": "Tinkerer's Workshop",
         "args": "Tiger Climbing Gear\u00a61^Tabi\u00a61^Black Belt\u00a61"
-    },
-    {
-        "result": "Mechanical Cart",
-        "resultid": "3353",
-        "station": "Mythril Anvil",
-        "args": "Mechanical Wheel Piece\u00a61^Mechanical Wagon Piece\u00a61^Mechanical Battery Piece\u00a61"
     },
     {
         "result": "Mechanical Eye",
@@ -14478,12 +14454,6 @@
         "args": "Purple Phaseblade\u00a61^Crystal Shard\u00a625"
     },
     {
-        "result": "Purple Phasesaber",
-        "resultid": "3767",
-        "station": "Mythril Anvil",
-        "args": "Purple Phaseblade\u00a61^Crystal Shard\u00a650"
-    },
-    {
         "result": "Purple Stained Glass",
         "resultid": "1267",
         "station": "Work Bench",
@@ -14728,12 +14698,6 @@
         "resultid": "3765",
         "station": "Mythril Anvil",
         "args": "Red Phaseblade\u00a61^Crystal Shard\u00a625"
-    },
-    {
-        "result": "Red Phasesaber",
-        "resultid": "3765",
-        "station": "Mythril Anvil",
-        "args": "Red Phaseblade\u00a61^Crystal Shard\u00a650"
     },
     {
         "result": "Red Squirrel Cage",
@@ -18699,12 +18663,6 @@
         "result": "Suspicious Looking Skull",
         "resultid": "5016",
         "station": "Mythril Anvil",
-        "args": "Mechanical Skull\u00a61^Mechanical Eye\u00a62^Adamantite Bar\u00a610^Soul of Night\u00a65^Soul of Light\u00a65"
-    },
-    {
-        "result": "Suspicious Looking Skull",
-        "resultid": "5016",
-        "station": "Mythril Anvil",
         "args": "Mechanical Skull\u00a61^Mechanical Eye\u00a62^Adamantite/Titanium Bar\u00a610^Soul of Night\u00a65^Soul of Light\u00a65"
     },
     {
@@ -18819,12 +18777,6 @@
         "result": "Terra Blade",
         "resultid": "757",
         "station": "Mythril Anvil",
-        "args": "True Night's Edge\u00a61^True Excalibur\u00a61"
-    },
-    {
-        "result": "Terra Blade",
-        "resultid": "757",
-        "station": "Mythril Anvil",
         "args": "True Night's Edge\u00a61^True Excalibur\u00a61^Broken Hero Sword\u00a61"
     },
     {
@@ -18868,12 +18820,6 @@
         "resultid": "3611",
         "station": "Tinkerer's Workshop",
         "args": "Multicolor Wrench\u00a61^Mechanical Lens\u00a61^Mechanical Ruler\u00a61^Wire\u00a660"
-    },
-    {
-        "result": "The Grand Design",
-        "resultid": "3611",
-        "station": "Tinkerer's Workshop",
-        "args": "Multicolor Wrench\u00a61^Mechanical Lens\u00a61^Ruler\u00a61^Wire\u00a660"
     },
     {
         "result": "The Meatball",
@@ -20682,12 +20628,6 @@
         "args": "White Phaseblade\u00a61^Crystal Shard\u00a625"
     },
     {
-        "result": "White Phasesaber",
-        "resultid": "3768",
-        "station": "Mythril Anvil",
-        "args": "White Phaseblade\u00a61^Crystal Shard\u00a650"
-    },
-    {
         "result": "White String",
         "resultid": "3306",
         "station": "Loom",
@@ -21112,12 +21052,6 @@
         "resultid": "3769",
         "station": "Mythril Anvil",
         "args": "Yellow Phaseblade\u00a61^Crystal Shard\u00a625"
-    },
-    {
-        "result": "Yellow Phasesaber",
-        "resultid": "3769",
-        "station": "Mythril Anvil",
-        "args": "Yellow Phaseblade\u00a61^Crystal Shard\u00a650"
     },
     {
         "result": "Yellow Stained Glass",

@@ -21,6 +21,10 @@ def setup_routes(app, memory_db):
     def get_researched():
         return jsonify(memory_db.items_progress)
 
+    @app.route("/stations")
+    def get_stations():
+        return jsonify(memory_db.stations)
+
     # @app.route("/items")
     # def get_item():
     #     return memory_db.items
