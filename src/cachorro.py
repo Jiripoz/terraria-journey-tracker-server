@@ -18,10 +18,7 @@ class Handler(watchdog.events.PatternMatchingEventHandler):
         self.callback = callback
 
     def on_modified(self, event):
-        logger.debug(
-            "Watchdog received modified event - % s., Time: %s"
-            % (event.src_path, datetime.now().isoformat())
-        )
+        logger.debug("Watchdog received modified event - % s., Time: %s" % (event.src_path, datetime.now().isoformat()))
         self.callback()
 
 
