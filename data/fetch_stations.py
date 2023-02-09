@@ -165,6 +165,5 @@ for id in set(stations_id_list):
         )
 
 
-
 with open("data/stations.json", "w") as s:
     json.dump(station_list, s, indent=4)

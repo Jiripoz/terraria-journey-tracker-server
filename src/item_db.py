@@ -30,8 +30,8 @@ class ItemDB:
         self.raw_dict = items
 
         for id in items:
-            self.items_dict[id] = Item(
-                id=id,
+            self.items_dict[int(id)] = Item(
+                id=int(id),
                 name=items[id]["name"],
                 internalName=items[id]["internalName"],
                 itemUrl=WIKI_ROOT_URL + items[id]["itemUrl"],
@@ -41,6 +41,14 @@ class ItemDB:
             )
 
     def get_item(self, item_id: int) -> Item:
+        item_id = int(item_id)
+        print(
+            "no get item o item id é: ",
+            item_id,
+            type(item_id),
+            list(self.items_dict)[0],
+            type(list(self.items_dict)[0]),
+        )
         if item_id in self.items_dict:
             return self.items_dict[item_id]
         return None
