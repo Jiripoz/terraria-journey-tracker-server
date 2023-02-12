@@ -139,8 +139,11 @@ for recipe in recipes:
 def get_craftables(station_id):
     craftable_list = []
     for recipe in recipes:
-        if recipe["station"][0] == station_id:
-            craftable_list.append({"name": recipe["name"], "id": recipe["id"], "ingredients": recipe["ingredients"]})
+        if int(recipe["station"][0]) == station_id:
+            if recipe["id"] in craftable_list:
+                continue
+            else:
+                craftable_list.append(recipe["id"])
 
     return craftable_list
 
@@ -159,7 +162,7 @@ for id in set(stations_id_list):
             {
                 "id": station.id,
                 "name": station.name,
-                "imageUrl": station.image_url,
+                "imageUrl": "https://terraria.wiki.gg/images/" + station.imageUrl,
                 "craftables": get_craftables(station.id),
             }
         )

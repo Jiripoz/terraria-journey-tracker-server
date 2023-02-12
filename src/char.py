@@ -49,7 +49,6 @@ def process_data(items_progress, partially_researched, researched, all_items, ea
 
     for id in partially_researched:
         item = item_db.get_item(id)
-        print(item, id, type(id))
         research_sum += items_progress[id]
         tuplas.append(
             (
@@ -80,7 +79,6 @@ def get_partial(lista_tuplas, easy):
                 "easy": easy,
             }
         )
-    logger.info(partial)
     return partial
 
 
@@ -241,5 +239,5 @@ def fetch_player():
     player = get_char(PLAYER_FILE_PATH)
     items_progress = player.get_items_progress()
     overview = player.get_overview()
-    stations = fetch_stations(player.easy, player.items_progress)
+    stations = fetch_stations()
     return overview, items_progress, stations

@@ -20,9 +20,6 @@ class Item:
     itemUrl: str
     category: list
 
-    def __str__(self):
-        return f"[{self.id}] {self.name} - {self.category} | Needs {self.research} for full research"
-
 
 class ItemDB:
     def __init__(self, items: list):
@@ -42,13 +39,6 @@ class ItemDB:
 
     def get_item(self, item_id: int) -> Item:
         item_id = int(item_id)
-        print(
-            "no get item o item id é: ",
-            item_id,
-            type(item_id),
-            list(self.items_dict)[0],
-            type(list(self.items_dict)[0]),
-        )
         if item_id in self.items_dict:
             return self.items_dict[item_id]
         return None
