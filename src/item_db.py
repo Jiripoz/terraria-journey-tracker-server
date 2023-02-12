@@ -20,9 +20,6 @@ class Item:
     itemUrl: str
     category: list
 
-    def __str__(self):
-        return f"[{self.id}] {self.name} - {self.category} | Needs {self.research} for full research"
-
 
 class ItemDB:
     def __init__(self, items: list):
@@ -30,8 +27,8 @@ class ItemDB:
         self.raw_dict = items
 
         for id in items:
-            self.items_dict[id] = Item(
-                id=id,
+            self.items_dict[int(id)] = Item(
+                id=int(id),
                 name=items[id]["name"],
                 internalName=items[id]["internalName"],
                 itemUrl=WIKI_ROOT_URL + items[id]["itemUrl"],
@@ -41,6 +38,7 @@ class ItemDB:
             )
 
     def get_item(self, item_id: int) -> Item:
+        item_id = int(item_id)
         if item_id in self.items_dict:
             return self.items_dict[item_id]
         return None
