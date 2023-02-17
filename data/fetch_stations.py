@@ -7,7 +7,7 @@ with open("data/recipe.json", "r") as f:
 special_stations = {
     0: {
         "name": "By Hand",
-        "imageUrl": "",
+        "imageUrl": ["https://terraria.wiki.gg/images/8/86/Hand_Of_Creation.png"],
     },
     -1: {"name": "Demon Altar", "imageUrl": ["https://terraria.wiki.gg/images/f/f8/Demon_Altar.png"]},
     -2: {"name": "Honey", "imageUrl": ["https://terraria.wiki.gg/images/c/c6/Honey.png"]},
@@ -33,94 +33,55 @@ special_stations = {
     },
     -8: {
         "name": "Table and Chair",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/0/00/Any_Table.gif",
-            "https://terraria.wiki.gg/images/3/3d/Any_Chair.gif",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/0/00/Any_Table.gif"],
     },
     -9: {
         "name": "Work Bench and Chair",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/d/d5/Any_Work_Bench.gif",
-            "https://terraria.wiki.gg/images/3/3d/Any_Chair.gif",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/d/d5/Any_Work_Bench.gif"],
     },
     -10: {
         "name": "Bone Welder and Ecto Mist",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/b/b3/Bone_Welder_%28placed%29.gif",
-            "https://terraria.wiki.gg/images/c/c9/Tombstone.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/b/b3/Bone_Welder_%28placed%29.gif"],
     },
     -11: {
         "name": "Heavy Work Bench and Ecto Mist",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/1/17/Heavy_Work_Bench_%28placed%29.png",
-            "https://terraria.wiki.gg/images/c/c9/Tombstone.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/1/17/Heavy_Work_Bench_%28placed%29.png"],
     },
     -12: {
         "name": "Iron Anvil and Ecto Mist",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/c/c3/Iron_Anvil.png",
-            "https://terraria.wiki.gg/images/c/c9/Tombstone.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/c/c3/Iron_Anvil.png"],
     },
     -13: {
         "name": "Loom and Ecto Mist",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/9/9d/Loom_%28placed%29.png",
-            "https://terraria.wiki.gg/images/c/c9/Tombstone.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/9/9d/Loom_%28placed%29.png"],
     },
     -14: {
         "name": "Tinkerer's Workshop and Ecto Mist",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/0/03/Tinkerer%27s_Workshop_%28placed%29.png",
-            "https://terraria.wiki.gg/images/c/c9/Tombstone.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/0/03/Tinkerer%27s_Workshop_%28placed%29.png"],
     },
     -15: {
         "name": "Work Bench and Ecto Mist",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/d/d5/Any_Work_Bench.gif",
-            "https://terraria.wiki.gg/images/c/c9/Tombstone.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/d/d5/Any_Work_Bench.gif"],
     },
     -16: {
         "name": "Crystal Ball and Honey",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/6/6f/Crystal_Ball_%28placed%29.png",
-            "https://terraria.wiki.gg/images/c/c6/Honey.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/6/6f/Crystal_Ball_%28placed%29.png"],
     },
     -17: {
         "name": "Crystal Ball and Lava",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/6/6f/Crystal_Ball_%28placed%29.png",
-            "https://terraria.wiki.gg/images/9/9f/Flame.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/6/6f/Crystal_Ball_%28placed%29.png"],
     },
     -18: {
         "name": "Crystal Ball and Water",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/6/6f/Crystal_Ball_%28placed%29.png",
-            "https://terraria.wiki.gg/images/9/9d/Water.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/6/6f/Crystal_Ball_%28placed%29.png"],
     },
     -19: {
         "name": "Sky Mill and Snow Biome",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/4/4c/Sky_Mill_%28placed%29.gif",
-            "https://terraria.wiki.gg/images/f/fa/Snow_Block.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/4/4c/Sky_Mill_%28placed%29.gif"],
     },
     -20: {
         "name": "Sky Mill and Water",
-        "imageUrl": [
-            "https://terraria.wiki.gg/images/4/4c/Sky_Mill_%28placed%29.gif",
-            "https://terraria.wiki.gg/images/9/9d/Water.png",
-        ],
+        "imageUrl": ["https://terraria.wiki.gg/images/4/4c/Sky_Mill_%28placed%29.gif"],
     },
 }
 
@@ -148,24 +109,26 @@ def get_craftables(station_id):
     return craftable_list
 
 
-station_list = []
+station_list = {}
 for id in set(stations_id_list):
     if id in list(special_stations):
         station = special_stations[id]
-        station_list.append(
-            {"id": id, "name": station["name"], "imageUrl": station["imageUrl"], "craftables": get_craftables(id)}
-        )
+        station_list[id] = {
+            "id": id,
+            "name": station["name"],
+            "imageUrl": station["imageUrl"],
+            "craftables": get_craftables(id),
+        }
+
         continue
     else:
         station = item_db.get_item(id)
-        station_list.append(
-            {
-                "id": station.id,
-                "name": station.name,
-                "imageUrl": "https://terraria.wiki.gg/images/" + station.imageUrl,
-                "craftables": get_craftables(station.id),
-            }
-        )
+        station_list[id] = {
+            "id": station.id,
+            "name": station.name,
+            "imageUrl": "https://terraria.wiki.gg/images/" + station.imageUrl,
+            "craftables": get_craftables(station.id),
+        }
 
 
 with open("data/stations.json", "w") as s:

@@ -29,6 +29,6 @@ def setup_routes(app, memory_db):
     # def get_item():
     #     return memory_db.items
 
-    # @app.route("/recipe_db")
-    # def get_recipe():
-    #     return memory_db.recipes
+    @app.route("/recipe_db")
+    def get_recipe():
+        return jsonify(memory_db.recipes)

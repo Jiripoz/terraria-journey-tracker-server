@@ -39,3 +39,34 @@ class RecipeDB:
 with open(RECIPE_JSON_PATH) as f:
     recipes = json.load(f)
     recipe_db = RecipeDB(recipes=recipes)
+
+
+def fetch_recipe_endpoint():
+    recipe_endpoint = {}
+    for recipe in recipes:
+        try:
+            if recipe["id"] in list(recipe_endpoint):
+                recipe_endpoint[int(recipe["id"])].append(
+                    {
+                        "id": int(recipe["id"]),
+                        "name": recipe["name"],
+                        "station": recipe["station"],
+                        "ingredients": recipe["ingredients"],
+                    }
+                )
+                continue
+            else:
+                recipe_endpoint[int(recipe["id"])] = []
+                recipe_endpoint[int(recipe["id"])].append(
+                    {
+                        "id": int(recipe["id"]),
+                        "name": recipe["name"],
+                        "station": recipe["station"],
+                        "ingredients": recipe["ingredients"],
+                    }
+                )
+                continue
+        except Exception as e:
+            print(e, recipe["id"])
+            continue
+    return recipe_endpoint
