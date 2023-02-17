@@ -12,27 +12,23 @@ def check_station():
 
 
 def fetch_stations():
-    crafting_stations = []
-    for station in station_list:
-        if station["id"] in special_stations:
-            crafting_stations.append(
-                {
-                    "id": station["id"],
-                    "name": station["name"],
-                    "imageUrl": station["imageUrl"],
-                    "craftables": station["craftables"],
-                }
-            )
+    crafting_stations = {}
+    for id in station_list:
+        if id in special_stations:
+            crafting_stations[id] = {
+                "id": station_list[id]["id"],
+                "name": station_list[id]["name"],
+                "imageUrl": station_list[id]["imageUrl"],
+                "craftables": station_list[id]["craftables"],
+            }
 
             continue
         else:
-            crafting_stations.append(
-                {
-                    "id": station["id"],
-                    "name": station["name"],
-                    "imageUrl": station["imageUrl"],
-                    "craftables": station["craftables"],
-                }
-            )
+            crafting_stations[id] = {
+                "id": station_list[id]["id"],
+                "name": station_list[id]["name"],
+                "imageUrl": station_list[id]["imageUrl"],
+                "craftables": station_list[id]["craftables"],
+            }
 
     return crafting_stations
