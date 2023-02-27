@@ -2,7 +2,7 @@
 
 The main purpose of this project is to track your progress when playing Terraria Journey mode. This repository is the backend part of the project and has the following features:
 - Decrypt the player file, read it and update the frontend whenever a change is made.
-- Has methods that can be run to get new items added to the the game when it is updated. This is made through the use of the MediaWiki API of [terraria.wiki.gg//api.php](https://terraria.wiki.gg//api.php) and [https://terraria.fandom.com/wiki/Terraria_Wiki]
+- Has methods that can be run to get new items added to the the game when it is updated. This is made through the use of the MediaWiki API of [terraria.wiki.gg//api.php](https://terraria.wiki.gg//api.php) and [terraria.fandom.com/api.php](https://terraria.fandom.com/api.php)
 
 ## Requirements
 To run this project you will need to install [OpenSSL](https://www.openssl.org/)
