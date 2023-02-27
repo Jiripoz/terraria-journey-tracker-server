@@ -9,6 +9,7 @@ from src.item_db import item_db
 from global_configs import PLAYER_FILE_PATH
 from src.log_setup import logger
 from src.recipe_db import recipe_db
+from src.crafting_station_db import fetch_stations
 
 
 def check_easy(item_id, researched):
@@ -58,7 +59,7 @@ def process_data(items_progress, partially_researched, researched, all_items, ea
         )
 
     for id in researched:
-        absolute += items_progress[str(id)]
+        absolute += items_progress[id]
 
     absolute += research_sum
 
@@ -78,7 +79,6 @@ def get_partial(lista_tuplas, easy):
                 "easy": easy,
             }
         )
-    logger.info(partial)
     return partial
 
 
@@ -156,7 +156,7 @@ class Char:
                 logger.error(f"Oooops! We are missing item {item_internalName}")
 
             logger.debug(f"Researched {research_progress}/{item.research} of {item.name}")
-            self.items_progress[item.id] = research_progress
+            self.items_progress[int(item.id)] = research_progress
             if item.research == research_progress:
                 self.researched.append(int(item.id))
             if item.research > research_progress:
@@ -239,5 +239,5 @@ def fetch_player():
     player = get_char(PLAYER_FILE_PATH)
     items_progress = player.get_items_progress()
     overview = player.get_overview()
-
-    return overview, items_progress
+    stations = fetch_stations()
+    return overview, items_progress, stations

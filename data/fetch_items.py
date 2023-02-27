@@ -78,6 +78,9 @@ import traceback
 with open("data/raw_item.json", "r") as f:
     raw_items = json.load(f)
 
+with open("data/items2.json", "r") as g:
+    raw_items2 = json.load(g)
+
 
 def search_duplicate_id(sub):
     id_list = []
@@ -180,6 +183,7 @@ for item in raw_items:
 
     item["tags"], prop_dict = transform_composite_labels(type_to_list(item["tag"]))
     new_item_dict[int(item["itemid"])] = {
+        "id": int(item["itemid"]),
         "name": item["name"],
         "imagefile": item["imagefile"],
         "consumable": switch_to_boolean(item["consumable"]),
@@ -197,7 +201,29 @@ for item in raw_items:
 
     added_ids[item["itemid"]] = True
 
-with open("data/items.json", "w") as g:
-    json.dump(new_item_dict, g, indent=4)
+for item in raw_items2:
+    if item["id"] in added_ids:
+        continue
+
+    new_item_dict[int(item["id"])] = {
+        "id": int(item["id"]),
+        "name": item["name"],
+        "imagefile": item["itemUrl"],
+        "consumable": False,
+        "hardmode": False,
+        "rare": 0,
+        "tooltip": "",
+        "research": int(item["research"]),
+        "imageUrl": item["imageUrl"],
+        "internalName": item["internalName"],
+        "tags": [],
+        "category": type_to_list(item["category"]),
+        "itemUrl": item["itemUrl"],
+    }
+    added_ids[item["id"]] = True
+
+
+with open("data/items.json", "w") as h:
+    json.dump(new_item_dict, h, indent=4)
 
 logger.debug("Done! Items saved in data folder as items.json and raw_items.json")
